@@ -1,0 +1,3427 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Dernekler - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+            --fameck-yellow: #ffd700;
+            --fameck-glow: 0 0 30px rgba(255,215,0,0.8);
+            --neon-red: #ff073a;
+        }
+
+        /* LOADING SYSTEM - ANASAYFADAKI GIBI */
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .ditib-loader.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 
+                0 20px 60px rgba(26, 35, 126, 0.15),
+                0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* İnternet Bağlantısı Yok Ekranı */
+        .offline-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000000;
+            background: var(--loading-bg);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .offline-screen.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--ditib-blue), var(--ditib-red));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            margin-bottom: 30px;
+            animation: offlinePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes offlinePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 40px rgba(26, 35, 126, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 50px rgba(196, 30, 58, 0.4); }
+        }
+
+        .offline-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ditib-blue);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .offline-message {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .offline-brand {
+            font-size: 14px;
+            color: var(--ditib-red);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(196,30,58,0.4);
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(196,30,58,0.5);
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader { 
+                transition: none !important;
+            }
+            .offline-screen {
+                transition: none !important;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .loader-logo-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+            .loader-logo {
+                width: 100px;
+                height: 100px;
+            }
+            .loader-text-main {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .loader-text-sub {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+            .offline-title {
+                font-size: 22px;
+            }
+            .offline-message {
+                font-size: 14px;
+                padding: 0 20px;
+            }
+        }
+
+        /* BASE STYLES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* BEYAZ ARKA PLAN KALDIRILDI - SADECE ARKA.PNG GÖRÜNECEK */
+
+        /* SCROLL PROGRESS */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text span:first-child {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* HERO SECTION */
+        .associations-hero {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            max-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .associations-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+            max-width: 900px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .associations-hero-content h1 {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .associations-hero-content p {
+            font-size: clamp(16px, 2vw, 22px);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .breadcrumb a {
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb i {
+            font-size: 12px;
+        }
+
+        /* STATS SECTION */
+        .hero-stats-section {
+            padding: 60px 20px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-stats-container {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(-50px);
+        }
+
+        .hero-stats-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red), var(--accent-blue));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-stats-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-stats-header h2 {
+            font-size: clamp(24px, 4vw, 36px);
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-stats-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+            border-radius: 2px;
+        }
+
+        .hero-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            position: relative;
+        }
+
+        .hero-stat-card {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .hero-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            transition: height 0.4s ease;
+            z-index: 0;
+        }
+
+        .hero-stat-card:hover::before {
+            height: 100%;
+        }
+
+        .hero-stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-stat-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+        }
+
+        .hero-stat-card:hover .hero-stat-icon {
+            background: var(--white);
+            color: var(--primary-blue);
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .hero-stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat-card:hover .hero-stat-number {
+            background: var(--white);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+        }
+
+        .hero-stat-card:hover .hero-stat-label {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* FILTER SECTION */
+        .filter-section {
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filter-container {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .filter-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-header h3 {
+            font-size: 24px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .filter-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.3s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .filter-group input {
+            background-image: none;
+            padding-right: 16px;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26,35,126,0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-filter {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-filter-primary {
+            background: linear-gradient(135deg, var(--primary-red), #b71c1c);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(196,30,58,0.4);
+        }
+
+        .btn-filter-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(196,30,58,0.5);
+        }
+
+        .btn-filter-secondary {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-filter-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* ASSOCIATIONS GRID */
+        .associations-section {
+            padding: 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--text-dark);
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: clamp(16px, 2vw, 18px);
+            max-width: 600px;
+            margin: 30px auto 0;
+            line-height: 1.8;
+        }
+
+        .associations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .association-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .association-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .association-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .association-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
+            z-index: 2;
+        }
+
+        .association-card.fameck-card {
+            border: 3px solid var(--neon-red);
+            box-shadow: 0 0 20px rgba(255,7,58,0.3);
+            order: -1;
+        }
+
+        .association-card.fameck-card::before {
+            background: linear-gradient(90deg, var(--neon-red), #ff4569);
+            height: 6px;
+        }
+
+        .association-card.fameck-card:hover {
+            box-shadow: 0 0 40px rgba(255,7,58,0.6), var(--shadow-xl);
+            transform: translateY(-15px) scale(1.03);
+            border-color: #ff073a;
+        }
+
+        .fameck-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, var(--neon-red), #ff4569);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255,7,58,0.5);
+            z-index: 10;
+            animation: neonPulse 1.5s infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            from { box-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red), 0 0 15px var(--neon-red); }
+            to { box-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), 0 0 30px var(--neon-red); }
+        }
+
+        .association-header {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .association-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .association-card:hover .association-image {
+            transform: scale(1.1);
+        }
+
+        .association-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
+        .association-region-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: var(--shadow-md);
+            z-index: 3;
+        }
+
+        .association-card.fameck-card .association-region-badge {
+            top: 50px;
+            background: var(--neon-red);
+        }
+
+        .association-title {
+            color: var(--white);
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .association-content {
+            padding: 25px;
+        }
+
+        .association-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .meta-row i {
+            width: 20px;
+            color: var(--primary-blue);
+            font-size: 16px;
+        }
+
+        .association-card.fameck-card .meta-row i {
+            color: var(--neon-red);
+        }
+
+        .meta-row a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .meta-row a:hover {
+            color: var(--primary-red);
+        }
+
+        .association-services {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .service-tag {
+            background: linear-gradient(135deg, rgba(26,35,126,0.1), rgba(25,118,210,0.1));
+            color: var(--primary-blue);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(26,35,126,0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .service-tag:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .association-card.fameck-card .service-tag {
+            background: linear-gradient(135deg, rgba(255,7,58,0.1), rgba(255,69,105,0.1));
+            color: var(--neon-red);
+            border-color: rgba(255,7,58,0.2);
+        }
+
+        .association-card.fameck-card .service-tag:hover {
+            background: var(--neon-red);
+            color: var(--white);
+        }
+
+        .association-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-association {
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-association-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+        }
+
+        .btn-association-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(26,35,126,0.4);
+        }
+
+        .association-card.fameck-card .btn-association-primary {
+            background: linear-gradient(135deg, var(--neon-red), #ff4569);
+        }
+
+        .association-card.fameck-card .btn-association-primary:hover {
+            box-shadow: 0 4px 20px rgba(255,7,58,0.6);
+        }
+
+        .btn-association-secondary {
+            background: rgba(255,255,255,0.9);
+            color: var(--text-dark);
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-association-secondary:hover {
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+            background: rgba(196,30,58,0.05);
+        }
+
+        /* MAP SECTION - YENI LEAFLET HARITA */
+        .map-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0a1929 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .map-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .map-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .map-header h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--white);
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .map-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .map-wrapper {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #franceMap {
+            width: 100%;
+            height: 500px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--white);
+            font-size: 14px;
+        }
+
+        .legend-pin {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .legend-pin.paris {
+            background: var(--primary-red);
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+        }
+
+        .legend-pin.fameck {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a1a;
+            width: 28px;
+            height: 28px;
+            border: 2px solid #fff;
+            font-size: 13px;
+        }
+
+        .legend-pin.other {
+            background: var(--primary-blue);
+        }
+
+        /* Leaflet Custom Markers - DÜZELTILMIŞ ORTALAMA */
+        .custom-div-icon {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .marker-pin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50% 50% 50% 0;
+            background: var(--primary-blue);
+            position: absolute;
+            transform: rotate(-45deg);
+            left: 50%;
+            top: 50%;
+            margin-left: -20px;
+            margin-top: -20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pinPulse 2s infinite;
+        }
+
+        .marker-pin::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            margin: 8px 0 0 8px;
+            background: #fff;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .marker-pin i {
+            transform: rotate(45deg);
+            font-size: 16px;
+            color: var(--primary-blue);
+            z-index: 10;
+            position: relative;
+        }
+
+        .marker-pin.paris-pin {
+            background: var(--primary-red);
+            width: 50px;
+            height: 50px;
+            margin-left: -25px;
+            margin-top: -25px;
+            animation: parisPulse 2s infinite;
+        }
+
+        .marker-pin.paris-pin::after {
+            width: 30px;
+            height: 30px;
+            margin: 10px 0 0 10px;
+        }
+
+        .marker-pin.paris-pin i {
+            font-size: 20px;
+            color: var(--primary-red);
+        }
+
+        .marker-pin.fameck-pin {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            width: 44px;
+            height: 44px;
+            margin-left: -22px;
+            margin-top: -22px;
+            border: 3px solid #fff;
+            animation: fameckPulse 1.5s infinite;
+        }
+
+        .marker-pin.fameck-pin::after {
+            width: 26px;
+            height: 26px;
+            margin: 9px 0 0 9px;
+        }
+
+        .marker-pin.fameck-pin i {
+            font-size: 18px;
+            color: #1a1a1a;
+        }
+
+        @keyframes pinPulse {
+            0%, 100% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-45deg) scale(1.1); }
+        }
+
+        @keyframes parisPulse {
+            0%, 100% { 
+                transform: rotate(-45deg) scale(1); 
+                box-shadow: 0 0 0 0 rgba(196,30,58,0.7), 0 4px 20px rgba(196,30,58,0.5);
+            }
+            50% { 
+                transform: rotate(-45deg) scale(1.1); 
+                box-shadow: 0 0 0 15px rgba(196,30,58,0), 0 6px 30px rgba(196,30,58,0.7);
+            }
+        }
+
+        @keyframes fameckPulse {
+            0%, 100% { 
+                transform: rotate(-45deg) scale(1); 
+                box-shadow: 0 0 0 0 rgba(255,215,0,0.7), 0 4px 20px rgba(255,215,0,0.5);
+            }
+            50% { 
+                transform: rotate(-45deg) scale(1.15); 
+                box-shadow: 0 0 0 20px rgba(255,215,0,0), 0 6px 30px rgba(255,215,0,0.8);
+            }
+        }
+
+        /* JOIN SECTION */
+        .join-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .join-container {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .join-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .join-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 50px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .join-container h2 {
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .join-container p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-join {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-join:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        /* FOOTER */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+
+        .footer-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100%;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* FAB */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* SCROLL TOP */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+        /* ANIMATIONS */
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .hero-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .associations-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .associations-hero {
+                height: 60vh;
+                min-height: 400px;
+            }
+            .hero-stats-container {
+                transform: translateY(-30px);
+            }
+            .map-wrapper {
+                padding: 20px;
+            }
+            #franceMap {
+                height: 400px;
+            }
+            .join-container {
+                padding: 40px 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            .associations-hero-content h1 {
+                font-size: 40px;
+            }
+            .hero-stats-container {
+                padding: 30px 20px;
+            }
+            .hero-stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            .associations-grid {
+                grid-template-columns: 1fr;
+            }
+            .association-actions {
+                grid-template-columns: 1fr;
+            }
+            .map-legend {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .join-container {
+                padding: 30px 20px;
+            }
+            .join-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+            }
+            #franceMap {
+                height: 350px;
+            }
+            .filter-logo {
+                height: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .associations-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+            .associations-hero-content h1 {
+                font-size: 32px;
+            }
+            .hero-stat-number {
+                font-size: 32px;
+            }
+            .section-title {
+                font-size: 28px;
+            }
+            .fameck-badge {
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+            #franceMap {
+                height: 300px;
+            }
+        }
+
+        @media print {
+            .fab-container, .scroll-top, .top-bar, .ditib-loader, .offline-screen {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            body::before {
+                display: none !important;
+            }
+            .association-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PROFESYONEL DITIB LOADING OVERLAY -->
+    <div class="ditib-loader" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="../img/ATFLogo.jpg" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        
+        <div class="loader-text-main">Yükleniyor</div>
+        <div class="loader-line"></div>
+        <div class="loader-text-sub">DITIB Fameck Sunar</div>
+        
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- İNTERNET BAĞLANTISI YOK EKRANI -->
+    <div class="offline-screen" id="offlineScreen">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        <h2 class="offline-title">İnternet Bağlantısı Yok</h2>
+        <p class="offline-message">Lütfen internet durumunuzu kontrol edin</p>
+        <button class="retry-btn" onclick="window.location.reload()">
+            <i class="fas fa-redo"></i> Tekrar Dene
+        </button>
+        <div class="offline-brand">Saygılarımızla DITIB Fameck</div>
+    </div>
+
+    <!-- SCROLL PROGRESS -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibstrasbourg.fr"><i class="fas fa-envelope"></i>cenazefonu@ditibstrasbourg.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="associations-hero">
+        <div class="associations-hero-content">
+            <h1>Derneklerimiz</h1>
+            <p>Fransa'nın dört bir yanına yayılmış 265 DİTİB derneği ile hizmetinizdeyiz</p>
+            <div class="breadcrumb">
+                <a href="../index.html">Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Dernekler</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="hero-stats-section">
+        <div class="hero-stats-container">
+            <div class="hero-stats-header">
+                <h2>Bölgesel Birimlerimiz</h2>
+                <p class="section-subtitle">Güçlü birliktelik, köklü hizmet</p>
+            </div>
+            <div class="hero-stats-grid">
+                <div class="hero-stat-card" onclick="filterByCity('paris')">
+                    <div class="hero-stat-icon" style="background: linear-gradient(135deg, #c41e3a, #ff1744);">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <div class="hero-stat-number">1</div>
+                    <div class="hero-stat-label">Ana Birim (Paris)</div>
+                </div>
+                <div class="hero-stat-card" onclick="filterByRegion('strasbourg')">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="hero-stat-number">4</div>
+                    <div class="hero-stat-label">Bölgesel Birim</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-mosque"></i>
+                    </div>
+                    <div class="hero-stat-number">265</div>
+                    <div class="hero-stat-label">Aktif Dernek</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="hero-stat-number">50K+</div>
+                    <div class="hero-stat-label">Aktif Üye</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FILTER SECTION -->
+    <section class="filter-section">
+        <div class="filter-container">
+            <div class="filter-header">
+                <h3>
+                    <img src="../img/ATFLogo.png" alt="Dernek Ara" class="filter-logo" onerror="this.style.display='none'">
+                    Dernek Ara
+                </h3>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Bölge Seçin</label>
+                    <select id="regionFilter">
+                        <option value="all">Tüm Bölgeler</option>
+                        <option value="paris">Paris Ana Birim</option>
+                        <option value="strasbourg">Strasbourg Bölgesi</option>
+                        <option value="lyon">Lyon Bölgesi</option>
+                        <option value="bordeaux">Bordeaux Bölgesi</option>
+                        <option value="nantes">Nantes Bölgesi</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Şehir Seçin</label>
+                    <select id="cityFilter">
+                        <option value="all">Tüm Şehirler</option>
+                        <option value="paris">Paris</option>
+                        <option value="marseille">Marseille</option>
+                        <option value="lyon">Lyon</option>
+                        <option value="toulouse">Toulouse</option>
+                        <option value="nice">Nice</option>
+                        <option value="nantes">Nantes</option>
+                        <option value="strasbourg">Strasbourg</option>
+                        <option value="montpellier">Montpellier</option>
+                        <option value="bordeaux">Bordeaux</option>
+                        <option value="lille">Lille</option>
+                        <option value="fameck">Fameck</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Hizmet Türü</label>
+                    <select id="serviceFilter">
+                        <option value="all">Tüm Hizmetler</option>
+                        <option value="cami">Cami</option>
+                        <option value="kuran">Kur'an Kursu</option>
+                        <option value="kultur">Kültür Merkezi</option>
+                        <option value="sosyal">Sosyal Tesis</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Dernek Ara</label>
+                    <input type="text" id="searchInput" placeholder="Dernek adı veya şehir...">
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn-filter btn-filter-primary" onclick="filterAssociations()">
+                    <i class="fas fa-search"></i> Ara
+                </button>
+                <button class="btn-filter btn-filter-secondary" onclick="resetFilters()">
+                    <i class="fas fa-redo"></i> Sıfırla
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ASSOCIATIONS GRID -->
+    <section class="associations-section">
+        <div class="section-header">
+            <h2 class="section-title">Birimlerimiz</h2>
+            <p class="section-subtitle">Size en yakın DİTİB birimini bulun</p>
+        </div>
+        <div class="associations-grid" id="associationsGrid">
+            
+            <!-- FAMECK CARD -->
+            <div class="association-card fameck-card" data-region="strasbourg" data-city="fameck" data-service="cami">
+                <div class="association-header">
+                    <span class="fameck-badge"><i class="fas fa-star"></i> MERKEZ</span>
+                    <img src="../img/cami-ici.jpg" alt="DITIB Fameck" class="association-image">
+                    <span class="association-region-badge">Strasbourg</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Fameck Merkez</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0382840795">03 82 84 07 95</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:ditib.fameck@gmail.com">ditib.fameck@gmail.com</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-clock"></i>
+                            <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-book-quran"></i> Kur'an Kursu</span>
+                        <span class="service-tag"><i class="fas fa-graduation-cap"></i> Eğitim</span>
+                        <span class="service-tag"><i class="fas fa-hand-holding-heart"></i> Sosyal</span>
+                        <span class="service-tag"><i class="fas fa-users"></i> Gençlik</span>
+                        <span class="service-tag"><i class="fas fa-female"></i> Kadın</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com/?q=69+A+Rue+de+la+Centrale,+57290+Fameck" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARIS ANA BİRİM -->
+            <div class="association-card" data-region="paris" data-city="paris" data-service="cami">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Paris" class="association-image">
+                    <span class="association-region-badge" style="background: #c41e3a;">ANA BİRİM</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Paris Ana Birim</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Rue de l'Exemple, 75001 Paris</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0143621616">01 43 62 16 16</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:paris@ditib.fr">paris@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-book-quran"></i> Kur'an Kursu</span>
+                        <span class="service-tag"><i class="fas fa-landmark"></i> İdari Merkez</span>
+                        <span class="service-tag"><i class="fas fa-globe"></i> Koordinasyon</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STRASBOURG BÖLGE -->
+            <div class="association-card" data-region="strasbourg" data-city="strasbourg" data-service="cami">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Strasbourg" class="association-image">
+                    <span class="association-region-badge">BÖLGE</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Strasbourg Bölge</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>12 Rue de l'Église, 67000 Strasbourg</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0388456789">03 88 45 67 89</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:strasbourg@ditib.fr">strasbourg@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-hand-holding-heart"></i> Sosyal</span>
+                        <span class="service-tag"><i class="fas fa-map-marked-alt"></i> Bölge Koordinasyon</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LYON BÖLGE -->
+            <div class="association-card" data-region="lyon" data-city="lyon" data-service="kultur">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Lyon" class="association-image">
+                    <span class="association-region-badge">BÖLGE</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Lyon Bölge</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>45 Avenue Berthelot, 69007 Lyon</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0478729012">04 78 72 90 12</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:lyon@ditib.fr">lyon@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-graduation-cap"></i> Eğitim</span>
+                        <span class="service-tag"><i class="fas fa-map-marked-alt"></i> Bölge Koordinasyon</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BORDEAUX BÖLGE -->
+            <div class="association-card" data-region="bordeaux" data-city="bordeaux" data-service="sosyal">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Bordeaux" class="association-image">
+                    <span class="association-region-badge">BÖLGE</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Bordeaux Bölge</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>78 Cours de la Somme, 33800 Bordeaux</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0556789012">05 56 78 90 12</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:bordeaux@ditib.fr">bordeaux@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-book"></i> Kütüphane</span>
+                        <span class="service-tag"><i class="fas fa-map-marked-alt"></i> Bölge Koordinasyon</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NANTES BÖLGE -->
+            <div class="association-card" data-region="nantes" data-city="nantes" data-service="kuran">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Nantes" class="association-image">
+                    <span class="association-region-badge">BÖLGE</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Nantes Bölge</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>15 Boulevard des Belges, 44000 Nantes</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0251234567">02 51 23 45 67</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:nantes@ditib.fr">nantes@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-child"></i> Çocuk</span>
+                        <span class="service-tag"><i class="fas fa-map-marked-alt"></i> Bölge Koordinasyon</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MARSEILLE -->
+            <div class="association-card" data-region="paris" data-city="marseille" data-service="cami">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Marseille" class="association-image">
+                    <span class="association-region-badge">DERNEK</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Marseille</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>25 La Canebière, 13001 Marseille</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0491234567">04 91 23 45 67</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:marseille@ditib.fr">marseille@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-graduation-cap"></i> Eğitim</span>
+                        <span class="service-tag"><i class="fas fa-users"></i> Toplum</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LILLE -->
+            <div class="association-card" data-region="paris" data-city="lille" data-service="kultur">
+                <div class="association-header">
+                    <img src="../img/cami-ici.jpg" alt="DITIB Lille" class="association-image">
+                    <span class="association-region-badge">DERNEK</span>
+                    <div class="association-overlay">
+                        <h3 class="association-title">DITIB Lille</h3>
+                    </div>
+                </div>
+                <div class="association-content">
+                    <div class="association-meta">
+                        <div class="meta-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>45 Rue de Paris, 59000 Lille</span>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:0320123456">03 20 12 34 56</a>
+                        </div>
+                        <div class="meta-row">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:lille@ditib.fr">lille@ditib.fr</a>
+                        </div>
+                    </div>
+                    <div class="association-services">
+                        <span class="service-tag"><i class="fas fa-mosque"></i> Cami</span>
+                        <span class="service-tag"><i class="fas fa-book-quran"></i> Kur'an Kursu</span>
+                        <span class="service-tag"><i class="fas fa-handshake"></i> Kültür</span>
+                    </div>
+                    <div class="association-actions">
+                        <a href="#" class="btn-association btn-association-primary">
+                            <i class="fas fa-info-circle"></i> Detay
+                        </a>
+                        <a href="https://maps.google.com" target="_blank" class="btn-association btn-association-secondary">
+                            <i class="fas fa-directions"></i> Yol Tarifi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MAP SECTION - YENI LEAFLET HARITA -->
+    <section class="map-section">
+        <div class="map-container">
+            <div class="map-header">
+                <h2>Birimler Haritası</h2>
+                <p>Fransa genelindeki tüm DİTİB birimlerimizi harita üzerinde görüntüleyin</p>
+            </div>
+            <div class="map-wrapper">
+                <div id="franceMap"></div>
+
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <div class="legend-pin paris">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <span><strong>Ana Birim (Paris)</strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-pin fameck">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <span><strong>Fameck (Merkez)</strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-pin other">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <span>Bölgesel Birimler</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JOIN SECTION -->
+    <section class="join-section">
+        <div class="join-container">
+            <div class="join-icon">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <h2>Birimimize Katılın</h2>
+            <p>DİTİB ailesinin bir parçası olun. Birimlerimize üye olarak dini ve sosyal hizmetlerimizden yararlanabilir, topluluğumuza destek olabilirsiniz.</p>
+            <a href="#" class="btn-join">
+                <i class="fas fa-user-plus"></i> Üye Ol
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- FAB -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://instagram.com" target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33610380277" target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0382840795" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- SCROLL TOP -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- LOADING SYSTEM JAVASCRIPT -->
+    <script>
+        const DitibLoader = {
+            container: document.getElementById('ditibLoader'),
+            offlineScreen: document.getElementById('offlineScreen'),
+            isTransitioning: false,
+            minDisplayTime: 1500,
+            startTime: 0,
+            
+            init: function() {
+                this.show();
+                this.startTime = Date.now();
+                
+                this.checkConnection();
+                
+                if (document.readyState === 'complete') {
+                    this.onPageReady();
+                } else {
+                    window.addEventListener('load', () => this.onPageReady());
+                }
+                
+                window.addEventListener('online', () => this.handleOnline());
+                window.addEventListener('offline', () => this.handleOffline());
+            },
+            
+            checkConnection: function() {
+                if (!navigator.onLine) {
+                    this.handleOffline();
+                }
+            },
+            
+            handleOffline: function() {
+                this.hide();
+                this.offlineScreen.classList.add('visible');
+            },
+            
+            handleOnline: function() {
+                this.offlineScreen.classList.remove('visible');
+                window.location.reload();
+            },
+            
+            show: function() {
+                this.container.classList.add('visible');
+            },
+            
+            hide: function() {
+                this.container.classList.remove('visible');
+            },
+            
+            onPageReady: function() {
+                const elapsed = Date.now() - this.startTime;
+                const remaining = Math.max(0, this.minDisplayTime - elapsed);
+                
+                setTimeout(() => {
+                    this.hide();
+                }, remaining);
+            },
+            
+            navigate: function(url) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+                
+                this.show();
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 400);
+            }
+        };
+
+        function initDitibTransitions() {
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
+                if (href.startsWith('http') && !href.includes(window.location.hostname)) return;
+                if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                if (href.startsWith('#')) return;
+                
+                link.addEventListener('click', function(e) {
+                    if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                    e.preventDefault();
+                    DitibLoader.navigate(href);
+                });
+            });
+        }
+
+        DitibLoader.init();
+        initDitibTransitions();
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                DitibLoader.hide();
+            }
+        });
+    </script>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script>
+        // Leaflet Harita Başlatma - DÜZELTILMIŞ ORTALAMA
+        function initMap() {
+            // Fransa merkezi koordinatları
+            const map = L.map('franceMap').setView([46.603354, 1.888334], 5);
+
+            // OpenStreetMap katmanı
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+
+            // Özel ikon oluşturma fonksiyonu - DÜZELTILMIŞ
+            function createCustomIcon(type, city) {
+                let className = 'marker-pin';
+                let iconClass = 'fas fa-building';
+                let iconColor = 'var(--primary-blue)';
+                let bgStyle = '';
+                
+                if (type === 'paris') {
+                    className += ' paris-pin';
+                    iconClass = 'fas fa-landmark';
+                    iconColor = 'var(--primary-red)';
+                    bgStyle = 'background: var(--primary-red);';
+                } else if (type === 'fameck') {
+                    className += ' fameck-pin';
+                    iconClass = 'fas fa-map-marker-alt';
+                    iconColor = '#1a1a1a';
+                    bgStyle = 'background: linear-gradient(135deg, #ffd700, #ffed4e);';
+                } else {
+                    bgStyle = 'background: var(--primary-blue);';
+                }
+                
+                return L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class="${className}" style="${bgStyle}">
+                            <i class="${iconClass}" style="color: ${iconColor}; transform: rotate(45deg); position: relative; z-index: 10;"></i>
+                           </div>`,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -40]
+                });
+            }
+
+            // Marker'ları ekle
+            const locations = [
+                { coords: [48.8566, 2.3522], type: 'paris', title: 'DITIB Paris Ana Birim', city: 'paris' },
+                { coords: [49.0999, 6.1333], type: 'fameck', title: 'DITIB Fameck Merkez', city: 'fameck' },
+                { coords: [48.5734, 7.7521], type: 'other', title: 'DITIB Strasbourg Bölge', city: 'strasbourg' },
+                { coords: [45.7640, 4.8357], type: 'other', title: 'DITIB Lyon Bölge', city: 'lyon' },
+                { coords: [44.8378, -0.5792], type: 'other', title: 'DITIB Bordeaux Bölge', city: 'bordeaux' },
+                { coords: [47.2184, -1.5536], type: 'other', title: 'DITIB Nantes Bölge', city: 'nantes' },
+                { coords: [43.2965, 5.3698], type: 'other', title: 'DITIB Marseille', city: 'marseille' },
+                { coords: [50.6292, 3.0573], type: 'other', title: 'DITIB Lille', city: 'lille' },
+                { coords: [43.6047, 1.4442], type: 'other', title: 'DITIB Toulouse', city: 'toulouse' },
+                { coords: [43.7102, 7.2620], type: 'other', title: 'DITIB Nice', city: 'nice' }
+            ];
+
+            locations.forEach(loc => {
+                const marker = L.marker(loc.coords, { icon: createCustomIcon(loc.type, loc.city) }).addTo(map);
+                
+                const popupContent = `
+                    <div style="text-align: center; min-width: 200px;">
+                        <h3 style="margin: 0 0 10px 0; color: var(--primary-blue); font-size: 16px;">${loc.title}</h3>
+                        <button onclick="filterByCity('${loc.city}')" style="background: var(--primary-red); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px;">
+                            <i class="fas fa-filter"></i> Filtrele
+                        </button>
+                    </div>
+                `;
+                
+                marker.bindPopup(popupContent);
+            });
+        }
+
+        // Sayfa yüklendiğinde haritayı başlat
+        document.addEventListener('DOMContentLoaded', initMap);
+
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToFameck() {
+            const fameckCard = document.querySelector('.fameck-card');
+            if (fameckCard) {
+                fameckCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                fameckCard.style.animation = 'none';
+                setTimeout(() => {
+                    fameckCard.style.animation = '';
+                }, 10);
+            }
+        }
+
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            const menuHeight = menu.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const btnRect = btn.getBoundingClientRect();
+            const availableSpace = btnRect.top;
+            
+            if (menuHeight > availableSpace - 20) {
+                menu.style.maxHeight = (availableSpace - 100) + 'px';
+                menu.style.overflowY = 'auto';
+            }
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        function filterAssociations() {
+            const region = document.getElementById('regionFilter').value;
+            const city = document.getElementById('cityFilter').value;
+            const service = document.getElementById('serviceFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const cards = document.querySelectorAll('.association-card');
+            
+            cards.forEach(card => {
+                const cardRegion = card.getAttribute('data-region');
+                const cardCity = card.getAttribute('data-city');
+                const cardService = card.getAttribute('data-service');
+                const title = card.querySelector('.association-title').textContent.toLowerCase();
+                const address = card.querySelector('.meta-row span').textContent.toLowerCase();
+                
+                const regionMatch = region === 'all' || cardRegion === region;
+                const cityMatch = city === 'all' || cardCity === city;
+                const serviceMatch = service === 'all' || cardService === service;
+                const searchMatch = searchTerm === '' || title.includes(searchTerm) || address.includes(searchTerm);
+                
+                if (regionMatch && cityMatch && serviceMatch && searchMatch) {
+                    card.style.display = 'block';
+                    setTimeout(() => {
+                        card.classList.add('visible');
+                    }, 100);
+                } else {
+                    card.style.display = 'none';
+                    card.classList.remove('visible');
+                }
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('regionFilter').value = 'all';
+            document.getElementById('cityFilter').value = 'all';
+            document.getElementById('serviceFilter').value = 'all';
+            document.getElementById('searchInput').value = '';
+            
+            const cards = document.querySelectorAll('.association-card');
+            cards.forEach(card => {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.classList.add('visible');
+                }, 100);
+            });
+        }
+
+        function filterByCity(city) {
+            document.getElementById('cityFilter').value = city;
+            filterAssociations();
+            document.querySelector('.associations-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function filterByRegion(region) {
+            document.getElementById('regionFilter').value = region;
+            filterAssociations();
+            document.querySelector('.associations-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.association-card').forEach((card, index) => {
+            card.style.transitionDelay = (index * 0.1) + 's';
+            observer.observe(card);
+        });
+
+        document.querySelectorAll('.hero-stat-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300 + (index * 100));
+        });
+
+        document.getElementById('regionFilter').addEventListener('change', function() {
+            const region = this.value;
+            const citySelect = document.getElementById('cityFilter');
+            const cities = {
+                'paris': ['paris', 'marseille', 'lille'],
+                'lyon': ['lyon'],
+                'strasbourg': ['strasbourg', 'fameck'],
+                'bordeaux': ['bordeaux'],
+                'nantes': ['nantes']
+            };
+            
+            const currentValue = citySelect.value;
+            citySelect.innerHTML = '<option value="all">Tüm Şehirler</option>';
+            
+            if (region !== 'all' && cities[region]) {
+                cities[region].forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city.charAt(0).toUpperCase() + city.slice(1);
+                    if (city === currentValue) option.selected = true;
+                    citySelect.appendChild(option);
+                });
+            } else {
+                const allCities = ['paris', 'marseille', 'lyon', 'toulouse', 'nice', 'nantes', 'strasbourg', 'montpellier', 'bordeaux', 'lille', 'fameck'];
+                allCities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city.charAt(0).toUpperCase() + city.slice(1);
+                    if (city === currentValue) option.selected = true;
+                    citySelect.appendChild(option);
+                });
+            }
+        });
+
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterAssociations, 300);
+        });
+
+        document.getElementById('searchInput').addEventListener('focus', function() {
+            this.style.borderColor = 'var(--primary-blue)';
+            this.style.boxShadow = '0 0 0 3px rgba(26,35,126,0.1)';
+        });
+
+        document.getElementById('searchInput').addEventListener('blur', function() {
+            this.style.borderColor = '#e0e0e0';
+            this.style.boxShadow = 'none';
+        });
+
+        function showLoadingState() {
+            const grid = document.getElementById('associationsGrid');
+            grid.style.opacity = '0.5';
+            grid.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                grid.style.opacity = '1';
+                grid.style.pointerEvents = 'all';
+            }, 300);
+        }
+
+        document.querySelectorAll('.btn-filter').forEach(btn => {
+            btn.addEventListener('click', showLoadingState);
+        });
+
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            
+            function updateCounter() {
+                start += increment;
+                if (start < target) {
+                    element.textContent = Math.floor(start).toLocaleString();
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target.toLocaleString();
+                }
+            }
+            
+            updateCounter();
+        }
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                    entry.target.classList.add('counted');
+                    const finalNumber = parseInt(entry.target.textContent.replace(/[^0-9]/g, ''));
+                    if (finalNumber) {
+                        animateCounter(entry.target, finalNumber);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.hero-stat-number').forEach(stat => {
+            statsObserver.observe(stat);
+        });
+
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.associations-hero');
+            if (hero) {
+                hero.style.backgroundPositionY = (scrolled * 0.5) + 'px';
+            }
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                console.log(diff > 0 ? 'Swiped left' : 'Swiped right');
+            }
+        }
+
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('.association-card').forEach(card => {
+                card.style.opacity = '1';
+                card.style.transform = 'none';
+            });
+        });
+
+        document.querySelectorAll('.service-tag').forEach(tag => {
+            tag.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const serviceText = this.textContent.toLowerCase();
+                let serviceValue = 'all';
+                
+                if (serviceText.includes('cami')) serviceValue = 'cami';
+                else if (serviceText.includes('kur\'an') || serviceText.includes('eğitim')) serviceValue = 'kuran';
+                else if (serviceText.includes('kültür') || serviceText.includes('kütüphane')) serviceValue = 'kultur';
+                else if (serviceText.includes('sosyal') || serviceText.includes('spor')) serviceValue = 'sosyal';
+                
+                document.getElementById('serviceFilter').value = serviceValue;
+                filterAssociations();
+                
+                document.querySelector('.filter-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        document.querySelectorAll('.service-tag').forEach(tag => {
+            tag.style.cursor = 'pointer';
+        });
+
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src || img.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+
+        window.addEventListener('online', () => {
+            console.log('Connection restored');
+        });
+
+        window.addEventListener('offline', () => {
+            alert('İnternet bağlantınız kesildi. Bazı özellikler çalışmayabilir.');
+        });
+
+        document.querySelectorAll('.btn-association, .btn-filter, .btn-join').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: rippleEffect 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }, 250);
+        });
+    </script>
+</body>
+</html>

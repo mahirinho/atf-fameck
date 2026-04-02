@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Online Ödeme - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(255, 0, 43, 0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        /* CRITICAL: Sayfa içeriğini başlangıçta gizle */
+        body {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        body.page-loaded {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.page-loading {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Main Loading Container */
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .ditib-loader.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Logo Container - Yuvarlak Çerçeve */
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 
+                0 20px 60px rgba(26, 35, 126, 0.15),
+                0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        /* Sol Mavi Gölge */
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        /* Sağ Kırmızı Gölge */
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        /* Logo Image */
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Yükleme Çemberi */
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Yükleme Çemberi Arkaplan */
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        /* Altın Noktalar */
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Yükleniyor Yazısı */
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Alt Yazı - DITIB Fameck Sunar */
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+        /* Altın Çizgi */
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+        /* İlerleme Çubuğu */
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader { display: none !important; }
+            body { opacity: 1 !important; visibility: visible !important; }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .loader-logo-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+            .loader-logo {
+                width: 100px;
+                height: 100px;
+            }
+            .loader-text-main {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .loader-text-sub {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+        }
+
+        /* YOUR EXISTING STYLES START */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url(img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text span:first-child {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* PAYMENT PAGE SPECIFIC STYLES */
+        .payment-hero {
+            position: relative;
+            min-height: calc(100vh - 140px);
+            padding: 60px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Left Side - Categories */
+        .payment-categories {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-categories::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .payment-header h1 {
+            font-size: clamp(28px, 4vw, 36px);
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .payment-header p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .prophet-quote {
+            background: linear-gradient(135deg, rgba(26,35,126,0.05), rgba(196,30,58,0.05));
+            border-left: 4px solid var(--primary-red);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 15px 15px 0;
+            font-style: italic;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        .prophet-quote::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            font-size: 60px;
+            color: var(--primary-red);
+            opacity: 0.2;
+            font-family: Georgia, serif;
+        }
+
+        .prophet-quote p {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .prophet-quote .source {
+            display: block;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-light);
+            font-style: normal;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .category-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-blue);
+        }
+
+        .category-btn.active::before {
+            opacity: 1;
+        }
+
+        .category-btn:hover .category-icon,
+        .category-btn.active .category-icon {
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .category-btn:hover .category-name,
+        .category-btn.active .category-name {
+            color: var(--white);
+        }
+
+        .category-icon {
+            font-size: 32px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .category-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        /* Amount Section */
+        .amount-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(0,0,0,0.05);
+        }
+
+        .amount-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .amount-btn {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 2px solid transparent;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .amount-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .amount-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .amount-btn:hover, .amount-btn.active {
+            transform: scale(1.1);
+            border-color: var(--primary-blue);
+            color: var(--white);
+            box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+        }
+
+        .amount-btn.active::before, .amount-btn:hover::before {
+            opacity: 1;
+        }
+
+        .custom-amount {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .custom-amount input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .custom-amount input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(26,35,126,0.1);
+        }
+
+        .custom-amount span {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Right Side - Payment Form */
+        .payment-form-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .payment-form-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 24px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .selected-info {
+            background: linear-gradient(135deg, rgba(26,35,126,0.1), rgba(196,30,58,0.1));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid rgba(26,35,126,0.2);
+        }
+
+        .selected-category {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .selected-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.8);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(26,35,126,0.1);
+        }
+
+        .card-input-wrapper {
+            position: relative;
+        }
+
+        .card-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--text-light);
+        }
+
+        .card-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-red), #b71c1c);
+            color: var(--white);
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pay-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .pay-btn:hover::before {
+            left: 100%;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(196,30,58,0.4);
+        }
+
+        .pay-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .secure-badge i {
+            color: #4caf50;
+        }
+
+        /* Bank Transfer Section */
+        .bank-transfer-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(0,0,0,0.05);
+        }
+
+        .bank-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .bank-toggle:hover {
+            color: var(--primary-red);
+        }
+
+        .bank-toggle i {
+            transition: transform 0.3s;
+        }
+
+        .bank-toggle.active i {
+            transform: rotate(180deg);
+        }
+
+        .bank-details {
+            background: rgba(255,255,255,0.6);
+            border-radius: 15px;
+            padding: 25px;
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .bank-details.show {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bank-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .bank-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .bank-label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .bank-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .copy-btn {
+            background: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-red);
+        }
+
+        /* Processing Modal */
+        .processing-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .processing-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .processing-content {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 50px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .processing-modal.show .processing-content {
+            transform: scale(1);
+        }
+
+        .processing-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid #f0f0f0;
+            border-top-color: var(--primary-blue);
+            border-right-color: var(--primary-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .processing-subtext {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Success Modal */
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100001;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .success-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .success-content {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 50px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .success-modal.show .success-content {
+            transform: scale(1);
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 50px;
+            color: var(--white);
+            animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .success-amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary-red);
+            margin-bottom: 30px;
+        }
+
+        .success-btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .success-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 70px;
+            height: 70px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-logo-circle img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* Scroll to Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .payment-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .amount-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            
+            .payment-hero {
+                padding: 30px 15px;
+            }
+            
+            .payment-categories,
+            .payment-form-wrapper {
+                padding: 25px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .category-btn {
+                padding: 15px 10px;
+            }
+            
+            .category-icon {
+                font-size: 24px;
+            }
+            
+            .category-name {
+                font-size: 12px;
+            }
+            
+            .amount-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .amount-btn {
+                font-size: 16px;
+            }
+            
+            .card-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .processing-content,
+            .success-content {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .payment-header h1 {
+                font-size: 24px;
+            }
+            
+            .prophet-quote {
+                padding: 15px;
+                font-size: 13px;
+            }
+            
+            .selected-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .bank-value {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PROFESYONEL DITIB LOADING OVERLAY -->
+    <div class="ditib-loader" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="img/ATFLogo.png" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        
+        <div class="loader-text-main">Yükleniyor</div>
+        <div class="loader-line"></div>
+        <div class="loader-text-sub">DITIB Fameck Sunar</div>
+        
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+    <!-- LOADING TRANSITION END -->
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right"> 
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://instagram.com" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="online-odeme.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- PAYMENT HERO SECTION -->
+    <section class="payment-hero">
+        <div class="payment-container">
+            <!-- Left Side - Categories -->
+            <div class="payment-categories">
+                <div class="payment-header">
+                    <h1>Online Bağış</h1>
+                    <p>Dini vecibelerinizi yerine getirin</p>
+                </div>
+
+                <div class="prophet-quote">
+                    <p>"Sadaka, kötülükleri ateşin yaktığı gibi yakar."</p>
+                    <span class="source">- Hz. Muhammed (s.a.v)</span>
+                </div>
+
+                <div class="categories-grid">
+                    <button class="category-btn active" data-category="zekat" data-name="Zekat">
+                        <div class="category-icon"><i class="fas fa-coins"></i></div>
+                        <div class="category-name">Zekat</div>
+                    </button>
+                    <button class="category-btn" data-category="fitre" data-name="Sadaka-i Fıtır - Fıtre">
+                        <div class="category-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div class="category-name">Sadaka-i Fıtır</div>
+                    </button>
+                    <button class="category-btn" data-category="fidye" data-name="Fidye">
+                        <div class="category-icon"><i class="fas fa-dove"></i></div>
+                        <div class="category-name">Fidye</div>
+                    </button>
+                    <button class="category-btn" data-category="adak" data-name="Adak - Akika - Şükür Kurban">
+                        <div class="category-icon"><i class="fas fa-sheep"></i></div>
+                        <div class="category-name">Adak / Kurban</div>
+                    </button>
+                    <button class="category-btn" data-category="uyelik" data-name="Cami Üyeliği - Adhésion Mosquée">
+                        <div class="category-icon"><i class="fas fa-mosque"></i></div>
+                        <div class="category-name">Cami Üyeliği</div>
+                    </button>
+                    <button class="category-btn" data-category="genel" data-name="Genel Bağış">
+                        <div class="category-icon"><i class="fas fa-gift"></i></div>
+                        <div class="category-name">Genel Bağış</div>
+                    </button>
+                </div>
+
+                <div class="amount-section">
+                    <div class="amount-title">Bağış Tutarı Seçin</div>
+                    <div class="amount-grid">
+                        <button class="amount-btn" data-amount="5"><span>5 €</span></button>
+                        <button class="amount-btn" data-amount="10"><span>10 €</span></button>
+                        <button class="amount-btn" data-amount="20"><span>20 €</span></button>
+                        <button class="amount-btn active" data-amount="30"><span>30 €</span></button>
+                        <button class="amount-btn" data-amount="50"><span>50 €</span></button>
+                        <button class="amount-btn" data-amount="125"><span>125 €</span></button>
+                    </div>
+                    <div class="custom-amount">
+                        <input type="number" id="customAmount" placeholder="Diğer tutar girin" min="1">
+                        <span>€</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Payment Form -->
+            <div class="payment-form-wrapper">
+                <div class="form-header">
+                    <h2>Ödeme Bilgileri</h2>
+                    <p>Güvenli ödeme altyapısı</p>
+                </div>
+
+                <div class="selected-info">
+                    <div class="selected-category" id="selectedCategory">Zekat</div>
+                    <div class="selected-amount" id="selectedAmount">30 €</div>
+                </div>
+
+                <form id="paymentForm">
+                    <div class="form-group">
+                        <label>Ad Soyad</label>
+                        <input type="text" id="cardHolder" placeholder="Kart üzerindeki isim" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kart Numarası</label>
+                        <div class="card-input-wrapper">
+                            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                            <i class="fab fa-cc-visa card-icon" id="cardIcon"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-row">
+                        <div class="form-group">
+                            <label>Son Kullanma Tarihi</label>
+                            <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" id="cvv" placeholder="123" maxlength="3" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>E-posta Adresi</label>
+                        <input type="email" id="email" placeholder="makbuz için e-posta" required>
+                    </div>
+
+                    <button type="submit" class="pay-btn" id="payBtn">
+                        <i class="fas fa-lock"></i>
+                        <span>Ödeme Yap</span>
+                    </button>
+                </form>
+
+                <div class="secure-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>256-bit SSL ile güvenli ödeme</span>
+                </div>
+
+                <!-- Bank Transfer Section -->
+                <div class="bank-transfer-section">
+                    <div class="bank-toggle" id="bankToggle">
+                        <i class="fas fa-university"></i>
+                        <span>Havale/EFT ile Öde</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="bank-details" id="bankDetails">
+                        <div class="bank-info-item">
+                            <span class="bank-label">Banka</span>
+                            <span class="bank-value">[BANKA ADI]</span>
+                        </div>
+                        <div class="bank-info-item">
+                            <span class="bank-label">IBAN</span>
+                            <div class="bank-value">
+                                <span id="ibanText">FR00 0000 0000 0000 0000 0000 000</span>
+                                <button class="copy-btn" onclick="copyIBAN()">
+                                    <i class="fas fa-copy"></i> Kopyala
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bank-info-item">
+                            <span class="bank-label">Hesap Sahibi</span>
+                            <span class="bank-value">DITIB FAMECK</span>
+                        </div>
+                        <div class="bank-info-item">
+                            <span class="bank-label">Açıklama</span>
+                            <span class="bank-value" id="transferDesc">Zekat - Ad Soyad</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Processing Modal -->
+    <div class="processing-modal" id="processingModal">
+        <div class="processing-content">
+            <div class="processing-spinner"></div>
+            <div class="processing-text">İşleniyor...</div>
+            <div class="processing-subtext">Lütfen bekleyin, ödemeniz güvenli olarak işleniyor</div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="success-title">Ödeme Başarılı!</div>
+            <div class="success-message">
+                Bağışınız için teşekkür ederiz. Makbuz e-posta adresinize gönderilmiştir.
+            </div>
+            <div class="success-amount" id="successAmount">30 €</div>
+            <button class="success-btn" onclick="closeSuccess()">
+                <i class="fas fa-home"></i> Ana Sayfaya Dön
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="#">DİTİB FRANSA</a>
+                <a href="#">DİTİB STRASBOURG</a>
+                <a href="#">DİTİB PARİS</a>
+                <a href="#">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <span style="font-size: 20px; font-weight: 800; color: var(--primary-blue);">DITIB</span>
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <span style="font-size: 18px; font-weight: 700; color: var(--primary-red);">DİTİL</span>
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>03 82 84 07 95</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>info@ditib.fr</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://instagram.com" target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33610380277" target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0143621616" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- ==========================================
+         PROFESYONEL DITIB LOADING TRANSITION SYSTEM
+         ========================================== -->
+    <script>
+        const DitibLoader = {
+            container: document.getElementById('ditibLoader'),
+            isTransitioning: false,
+            minDisplayTime: 2000,
+            
+            init: function() {
+                this.show();
+                document.body.classList.add('page-loading');
+                
+                if (document.readyState === 'complete') {
+                    this.onPageReady();
+                } else {
+                    window.addEventListener('load', () => this.onPageReady());
+                }
+                
+                this.initLinkListeners();
+            },
+            
+            show: function() {
+                this.container.classList.add('active');
+            },
+            
+            hide: function() {
+                this.container.classList.remove('active');
+            },
+            
+            onPageReady: function() {
+                setTimeout(() => {
+                    this.hide();
+                    document.body.classList.remove('page-loading');
+                    document.body.classList.add('page-loaded');
+                    this.isTransitioning = false;
+                }, this.minDisplayTime);
+            },
+            
+            initLinkListeners: function() {
+                const links = document.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    
+                    if (!href || href === '#' || href.startsWith('javascript:')) return;
+                    if (href.startsWith('http') && !href.includes(window.location.hostname)) return;
+                    if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                    if (href.startsWith('#')) return;
+                    
+                    link.addEventListener('click', (e) => {
+                        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                        e.preventDefault();
+                        this.navigate(href);
+                    });
+                });
+            },
+            
+            navigate: function(url) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+                
+                this.show();
+                document.body.classList.remove('page-loaded');
+                document.body.classList.add('page-loading');
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 400);
+            }
+        };
+
+        DitibLoader.init();
+
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                DitibLoader.hide();
+                document.body.classList.remove('page-loading');
+                document.body.classList.add('page-loaded');
+            }
+        });
+    </script>
+
+    <!-- ==========================================
+         PAYMENT SYSTEM JAVASCRIPT
+         ========================================== -->
+    <script>
+        // Category Selection
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const selectedCategoryEl = document.getElementById('selectedCategory');
+        const transferDescEl = document.getElementById('transferDesc');
+        let currentCategory = 'Zekat';
+
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.name;
+                selectedCategoryEl.textContent = currentCategory;
+                updateTransferDesc();
+            });
+        });
+
+        // Amount Selection
+        const amountBtns = document.querySelectorAll('.amount-btn');
+        const selectedAmountEl = document.getElementById('selectedAmount');
+        const customAmountInput = document.getElementById('customAmount');
+        let currentAmount = 30;
+
+        amountBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                amountBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentAmount = btn.dataset.amount;
+                selectedAmountEl.textContent = currentAmount + ' €';
+                customAmountInput.value = '';
+                updateTransferDesc();
+            });
+        });
+
+        customAmountInput.addEventListener('input', (e) => {
+            if (e.target.value) {
+                amountBtns.forEach(b => b.classList.remove('active'));
+                currentAmount = e.target.value;
+                selectedAmountEl.textContent = currentAmount + ' €';
+                updateTransferDesc();
+            }
+        });
+
+        function updateTransferDesc() {
+            const holder = document.getElementById('cardHolder').value || 'Ad Soyad';
+            transferDescEl.textContent = `${currentCategory} - ${holder}`;
+        }
+
+        document.getElementById('cardHolder').addEventListener('input', updateTransferDesc);
+
+        // Card Number Formatting
+        const cardNumberInput = document.getElementById('cardNumber');
+        const cardIcon = document.getElementById('cardIcon');
+
+        cardNumberInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            e.target.value = formattedValue.substring(0, 19);
+            
+            // Update card icon based on number
+            if (value.startsWith('4')) {
+                cardIcon.className = 'fab fa-cc-visa card-icon';
+            } else if (value.startsWith('5')) {
+                cardIcon.className = 'fab fa-cc-mastercard card-icon';
+            } else if (value.startsWith('3')) {
+                cardIcon.className = 'fab fa-cc-amex card-icon';
+            } else {
+                cardIcon.className = 'fas fa-credit-card card-icon';
+            }
+        });
+
+        // Expiry Date Formatting
+        const expiryInput = document.getElementById('expiryDate');
+        expiryInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // CVV Only Numbers
+        const cvvInput = document.getElementById('cvv');
+        cvvInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+        });
+
+        // Bank Toggle
+        const bankToggle = document.getElementById('bankToggle');
+        const bankDetails = document.getElementById('bankDetails');
+
+        bankToggle.addEventListener('click', () => {
+            bankToggle.classList.toggle('active');
+            bankDetails.classList.toggle('show');
+        });
+
+        // Copy IBAN
+        function copyIBAN() {
+            const iban = document.getElementById('ibanText').textContent;
+            navigator.clipboard.writeText(iban).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Kopyalandı';
+                btn.style.background = '#4caf50';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Payment Form Submit
+        const paymentForm = document.getElementById('paymentForm');
+        const processingModal = document.getElementById('processingModal');
+        const successModal = document.getElementById('successModal');
+        const successAmount = document.getElementById('successAmount');
+
+        paymentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Show processing
+            processingModal.classList.add('show');
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                processingModal.classList.remove('show');
+                successAmount.textContent = currentAmount + ' €';
+                successModal.classList.add('show');
+            }, 3000);
+        });
+
+        function closeSuccess() {
+            successModal.classList.remove('show');
+            window.location.href = 'index.html';
+        }
+
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            const menuHeight = menu.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const btnRect = btn.getBoundingClientRect();
+            const availableSpace = btnRect.top;
+            
+            if (menuHeight > availableSpace - 20) {
+                menu.style.maxHeight = (availableSpace - 100) + 'px';
+                menu.style.overflowY = 'auto';
+            }
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+                processingModal.classList.remove('show');
+            }
+        });
+
+        // Animations on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.payment-categories, .payment-form-wrapper');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100 + (index * 200));
+            });
+        });
+    </script>
+</body>
+</html>

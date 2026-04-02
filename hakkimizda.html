@@ -1,0 +1,2527 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Hakkımızda - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ============================================
+         DITIB LOADING TRANSITION SYSTEM
+         ============================================ -->
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        body {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        body.page-loaded {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.page-loading {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .ditib-loader.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 
+                0 20px 60px rgba(26, 35, 126, 0.15),
+                0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        /* Sağ Kırmızı Gölge */
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        /* Logo Image */
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Yükleme Çemberi */
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+       
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+       
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader { display: none !important; }
+            body { opacity: 1 !important; visibility: visible !important; }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .loader-logo-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+            .loader-logo {
+                width: 100px;
+                height: 100px;
+            }
+            .loader-text-main {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .loader-text-sub {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+    
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text span:first-child {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        
+        .about-hero {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            max-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+     
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3); 
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+            max-width: 900px;
+        }
+
+        .about-hero-content h1 {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: -2px;
+        }
+
+        .about-hero-content p {
+            font-size: clamp(16px, 2vw, 22px);
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb i {
+            font-size: 12px;
+        }
+
+       
+        .hero-stats-section {
+            padding: 60px 20px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-stats-container {
+            background: rgba(255,255,255,0.7); 
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-stats-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red), var(--accent-blue));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-stats-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-stats-header h2 {
+            font-size: clamp(24px, 4vw, 36px);
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-stats-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+            border-radius: 2px;
+        }
+
+        .hero-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            position: relative;
+        }
+
+        .hero-stat-card {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.6); /* Opaklık düşürüldü */
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            transition: height 0.4s ease;
+            z-index: 0;
+        }
+
+        .hero-stat-card:hover::before {
+            height: 100%;
+        }
+
+        .hero-stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-stat-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+        }
+
+        .hero-stat-card:hover .hero-stat-icon {
+            background: var(--white);
+            color: var(--primary-blue);
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .hero-stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+        }
+
+        .hero-stat-card:hover .hero-stat-number {
+            background: var(--white);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+        }
+
+        .hero-stat-card:hover .hero-stat-label {
+            color: rgba(255,255,255,0.9);
+        }
+
+        
+        .history-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            background-image: url('../img/arka.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .history-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.4); /* 0.85 yerine 0.4 - daha şeffaf */
+            pointer-events: none;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--text-dark);
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: clamp(16px, 2vw, 18px);
+            max-width: 600px;
+            margin: 30px auto 0;
+            line-height: 1.8;
+        }
+
+        .timeline-wrapper {
+            position: relative;
+            padding: 40px 0;
+            z-index: 1;
+        }
+
+        .timeline-line-main {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--primary-red), var(--accent-blue));
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(to bottom, var(--primary-red), var(--primary-blue));
+            transform: translateX(-50%);
+            border-radius: 2px;
+            transition: height 1s ease;
+        }
+
+        
+        .timeline-item-new {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+            min-height: 200px;
+        }
+
+        .timeline-item-new.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+      
+        .timeline-left {
+            width: 45%;
+            padding-right: 40px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+     
+        .timeline-right {
+            width: 45%;
+            padding-left: 40px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+       
+        .timeline-center {
+            width: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .timeline-card {
+            background: rgba(255,255,255,0.75); 
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.4);
+            position: relative;
+            transition: all 0.4s;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
+            border-radius: 24px 24px 0 0;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            background: rgba(255,255,255,0.85);
+        }
+
+        .timeline-year-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary-red), #b71c1c);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(196,30,58,0.3);
+        }
+
+        .timeline-year-badge i {
+            font-size: 20px;
+        }
+
+        .timeline-card h3 {
+            font-size: 24px;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .timeline-card p {
+            color: var(--text-light);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .timeline-node {
+            width: 30px;
+            height: 30px;
+            background: var(--white);
+            border: 5px solid var(--primary-red);
+            border-radius: 50%;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 0 8px rgba(196,30,58,0.2), var(--shadow-md);
+            transition: all 0.4s;
+            cursor: pointer;
+        }
+
+        .timeline-node:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 0 15px rgba(196,30,58,0.2), var(--shadow-lg);
+        }
+
+        .timeline-node::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: var(--primary-red);
+            border-radius: 50%;
+        }
+
+       
+        .mission-vision-section {
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+            background-image: url('../img/arka.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .mission-vision-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+          
+            pointer-events: none;
+        }
+
+        .mv-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mv-card {
+            background: rgba(255,255,255,0.75); 
+            border-radius: 30px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.4);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        
+        .mv-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .mv-card.mission::before {
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-blue));
+        }
+
+        .mv-card.vision::before {
+            background: linear-gradient(90deg, var(--primary-red), #e53935);
+        }
+
+        .mv-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+            background: rgba(255,255,255,0.85);
+        }
+
+        .mv-icon-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .mv-icon-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        .mv-card.mission .mv-icon-bg {
+            background: var(--primary-blue);
+        }
+
+        .mv-card.vision .mv-icon-bg {
+            background: var(--primary-red);
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .mv-icon {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .mv-card.mission .mv-icon {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+        }
+
+        .mv-card.vision .mv-icon {
+            background: linear-gradient(135deg, var(--primary-red), #e53935);
+        }
+
+        .mv-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .mv-text {
+            font-size: 16px;
+            color: var(--text-light);
+            line-height: 1.9;
+        }
+
+      
+        .content-blog-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .content-blog-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .blog-container {
+            background: rgba(255,255,255,0.75); /* Opaklık düşürüldü */
+            border-radius: 30px;
+            padding: 80px 60px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255,255,255,0.4);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            z-index: 1;
+        }
+
+        .blog-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red), var(--accent-blue));
+            background-size: 200% 100%;
+            animation: gradientMove 4s ease infinite;
+        }
+
+        .blog-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .blog-header h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .blog-content {
+            font-size: 18px;
+            line-height: 2;
+            color: var(--text-dark);
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .blog-content p {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .blog-content p:first-child::first-letter {
+            font-size: 60px;
+            float: none;
+            line-height: 1;
+            padding-right: 0;
+            color: var(--primary-red);
+            font-weight: 800;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(26,35,126,0.05), rgba(196,30,58,0.05));
+            border-left: 5px solid var(--primary-red);
+            padding: 40px;
+            margin: 50px auto;
+            border-radius: 0 20px 20px 0;
+            position: relative;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .highlight-box::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 100px;
+            color: var(--primary-red);
+            opacity: 0.2;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            font-style: italic;
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .stats-inline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin: 60px auto;
+            padding: 50px;
+            background: linear-gradient(135deg, var(--dark-bg), #0a1929);
+            border-radius: 25px;
+            color: var(--white);
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .stat-inline-item h4 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, #64b5f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-inline-item p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+            text-align: center;
+        }
+
+        
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 70px;
+            height: 70px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-logo-circle img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* Scroll to Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+       
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        
+        @media (max-width: 1200px) {
+            .hero-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .about-hero {
+                height: 60vh;
+                min-height: 400px;
+            }
+            
+            .mv-container {
+                grid-template-columns: 1fr;
+            }
+            
+          
+            .timeline-item-new {
+                flex-direction: column;
+            }
+            
+            .timeline-left, .timeline-right {
+                width: 100%;
+                padding: 0;
+                justify-content: center;
+            }
+            
+            .timeline-center {
+                display: none;
+            }
+            
+            .timeline-line-main {
+                left: 20px;
+            }
+            
+            .stats-inline {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .blog-container {
+                padding: 50px 30px;
+            }
+            
+            .blog-content {
+                text-align: left;
+            }
+            
+            .blog-content p {
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            
+            .about-hero-content h1 {
+                font-size: 40px;
+            }
+            
+            .hero-stats-container {
+                padding: 30px 20px;
+            }
+            
+            .hero-stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .timeline-card {
+                padding: 25px;
+            }
+            
+            .mv-card {
+                padding: 35px 25px;
+            }
+            
+            .blog-container {
+                padding: 40px 20px;
+            }
+            
+            .stats-inline {
+                padding: 30px 20px;
+            }
+            
+            .stat-inline-item h4 {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .about-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+            
+            .about-hero-content h1 {
+                font-size: 32px;
+            }
+            
+            .hero-stat-number {
+                font-size: 32px;
+            }
+            
+            .timeline-year-badge {
+                font-size: 16px;
+                padding: 10px 18px;
+            }
+            
+            .mv-icon-wrapper {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .mv-icon {
+                font-size: 40px;
+            }
+            
+            .blog-content {
+                font-size: 16px;
+            }
+            
+            .highlight-box {
+                padding: 30px 20px;
+            }
+            
+            .highlight-box p {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- DITIB LOADING OVERLAY -->
+    <div class="ditib-loader" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="../img/ATFLogo.png" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        
+        <div class="loader-text-main">Yükleniyor</div>
+        <div class="loader-line"></div>
+        <div class="loader-text-sub">DITIB Fameck Sunar</div>
+        
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+    <!-- LOADING TRANSITION END -->
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right"> 
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/ " target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com " target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://youtube.com " target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <h1>Hakkımızda</h1>
+            <p>Fransa'daki Müslümanların manevi ve dini ihtiyaçlarını karşılamak için 1986'dan beri hizmetinizdeyiz</p>
+            <div class="breadcrumb">
+                <a href="../index.html">Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Hakkımızda</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- HERO STATS -->
+    <section class="hero-stats-section">
+        <div class="hero-stats-container">
+            <div class="hero-stats-header">
+                <h2>DİTİB FAMECK</h2>
+                <p class="section-subtitle">Fransa'nın en büyük İslam kuruluşu olarak 1985'ten beri hizmetinizdeyiz</p>
+            </div>
+            
+            <div class="hero-stats-grid">
+                <div class="hero-stat-card">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-mosque"></i>
+                    </div>
+                    <div class="hero-stat-number">265</div>
+                    <div class="hero-stat-label">DİTİB Dernek Sayımız</div>
+                </div>
+                
+                <div class="hero-stat-card">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="hero-stat-number">5</div>
+                    <div class="hero-stat-label">Bölgesel Birim</div>
+                </div>
+                
+                <div class="hero-stat-card">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="hero-stat-number">1985</div>
+                    <div class="hero-stat-label">Kuruluş Yılı</div>
+                </div>
+                
+                <div class="hero-stat-card">
+                    <div class="hero-stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="hero-stat-number">244.444</div>
+                    <div class="hero-stat-label">Cenaze Fonu Üyesi</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TARİHÇE SECTION -->
+    <section class="history-section">
+        <div class="section-header">
+            <h2 class="section-title">Tarihçemiz</h2>
+            <p class="section-subtitle">DİTİB Fameck'in kuruluşundan günümüze uzanan köklü geçmişi ve gelecek vizyonu</p>
+        </div>
+
+        <div class="timeline-wrapper">
+            <div class="timeline-line-main"></div>
+            <div class="timeline-progress" id="timelineProgress"></div>
+
+            <!-- 1985 -->
+            <div class="timeline-item-new">
+                <div class="timeline-left">
+                    <div class="timeline-card">
+                        <div class="timeline-year-badge">
+                            <i class="fas fa-flag"></i> 1985
+                        </div>
+                        <h3>Kuruluş ve İlk Adımlar</h3>
+                        <p>DİTİB Fameck, Fransa'daki Müslüman toplumunun manevi ve dini ihtiyaçlarını karşılamak amacıyla 1985 yılında kuruldu. İlk yıllarda küçük bir dernek olarak başlayan bu serüven, zamanla büyük bir topluluk hareketine dönüştü.</p>
+                    </div>
+                </div>
+                <div class="timeline-center">
+                    <div class="timeline-node"></div>
+                </div>
+                <div class="timeline-right"></div>
+            </div>
+
+            <!-- 1990-2000 -->
+            <div class="timeline-item-new">
+                <div class="timeline-left"></div>
+                <div class="timeline-center">
+                    <div class="timeline-node"></div>
+                </div>
+                <div class="timeline-right">
+                    <div class="timeline-card">
+                        <div class="timeline-year-badge">
+                            <i class="fas fa-mosque"></i> 1990-2000
+                        </div>
+                        <h3>Büyüme ve Yayılma Dönemi</h3>
+                        <p>1990'lı yıllarda hızlı bir büyüme sürecine giren DİTİB, Fransa'nın farklı şehirlerinde yeni dernekler kurarak hizmet ağını genişletti. Cami inşaatları, eğitim merkezleri ve sosyal tesisler bu dönemde hayata geçirildi.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2000-2010 -->
+            <div class="timeline-item-new">
+                <div class="timeline-left">
+                    <div class="timeline-card">
+                        <div class="timeline-year-badge">
+                            <i class="fas fa-graduation-cap"></i> 2000-2010
+                        </div>
+                        <h3>Eğitim ve Kültür Hamlesi</h3>
+                        <p>Yeni bin yılla birlikte eğitim alanında büyük atılımlar yapıldı. Kur'an kursları, dil eğitimleri ve kültürel aktivitelerle genç nesillerin manevi gelişimine odaklanıldı. Aynı zamanda entegrasyon çalışmaları hız kazandı.</p>
+                    </div>
+                </div>
+                <div class="timeline-center">
+                    <div class="timeline-node"></div>
+                </div>
+                <div class="timeline-right"></div>
+            </div>
+
+            <!-- 2010-2020 -->
+            <div class="timeline-item-new">
+                <div class="timeline-left"></div>
+                <div class="timeline-center">
+                    <div class="timeline-node"></div>
+                </div>
+                <div class="timeline-right">
+                    <div class="timeline-card">
+                        <div class="timeline-year-badge">
+                            <i class="fas fa-globe"></i> 2010-2020
+                        </div>
+                        <h3>Dijital Dönüşüm ve Modernizasyon</h3>
+                        <p>Teknolojik altyapı güçlendirilerek online eğitimler, dijital hizmetler ve modern iletişim kanalları devreye sokuldu. Cenaze fonu gibi sosyal yardımlaşma projeleri büyük kitlelere ulaştı.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2020-Günümüz -->
+            <div class="timeline-item-new">
+                <div class="timeline-left">
+                    <div class="timeline-card">
+                        <div class="timeline-year-badge">
+                            <i class="fas fa-star"></i> 2020-Günümüz
+                        </div>
+                        <h3>265 Dernek ile Güçlü Gelecek</h3>
+                        <p>Bugün 265 dernek, 5 bölgesel birim ve binlerce gönüllü ile Fransa'nın en büyük İslam kuruluşu olarak hizmet veriyoruz. Geleceğe emin adımlarla yürüyor, yeni nesillere değerlerimizi aktarıyoruz.</p>
+                    </div>
+                </div>
+                <div class="timeline-center">
+                    <div class="timeline-node"></div>
+                </div>
+                <div class="timeline-right"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GÖREV & VİZYON -->
+    <section class="mission-vision-section">
+        <div class="section-header">
+            <h2 class="section-title">DİTİB Fameck Vizyonu & Görevi</h2>
+            <p class="section-subtitle">Geleceğe emin adımlarla yürüyen köklü bir kuruluş</p>
+        </div>
+
+        <div class="mv-container">
+            <div class="mv-card mission">
+                <div class="mv-icon-wrapper">
+                    <div class="mv-icon-bg"></div>
+                    <div class="mv-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                </div>
+                <h3 class="mv-title">Görevimiz</h3>
+                <p class="mv-text">
+                    Fransa'daki Müslüman toplumunun dini, manevi ve sosyal ihtiyaçlarını en üst düzeyde karşılamak, 
+                    İslam'ın barış, hoşgörü ve kardeşlik mesajını tüm kesimlere ulaştırmak, 
+                    toplumsal uyumu güçlendirmek ve yeni nesillere İslami değerleri en doğru şekilde aktarmak.
+                </p>
+            </div>
+
+            <div class="mv-card vision">
+                <div class="mv-icon-wrapper">
+                    <div class="mv-icon-bg"></div>
+                    <div class="mv-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                </div>
+                <h3 class="mv-title">Vizyonumuz</h3>
+                <p class="mv-text">
+                    Fransa'daki Müslümanların ilk başvuru adresi olmak, eğitim ve kültür alanlarında 
+                    öncü bir kurum olarak tanınmak, evrensel değerlerle İslami ilkeleri harmanlayarak 
+                    gelecek nesillere rol model olmak ve Avrupa'nın en etkili İslam kuruluşlarından biri haline gelmek.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENT BLOG -->
+    <section class="content-blog-section">
+        <div class="blog-container">
+            <div class="blog-header">
+                <h2>Birlikte Güçlüyüz</h2>
+                <p class="section-subtitle">DİTİB Fameck'in hikayesi ve değerleri</p>
+            </div>
+
+            <div class="blog-content">
+                <p>
+                    DİTİB Fameck, 1985 yılında Fransa'daki Müslüman toplumunun manevi rehberliği ve dini hizmetleri 
+                    ihtiyacını karşılamak amacıyla kurulmuş köklü bir sivil toplum kuruluşudur. Kurulduğu günden bu yana 
+                    geçen yaklaşık 40 yıllık süreçte, sadece bir dernek olmanın ötesinde, toplumun her kesimine ulaşan 
+                    kapsamlı bir hizmet ağı haline gelmiştir.
+                </p>
+
+                <div class="highlight-box">
+                    <p>"DİTİB sadece bir cami derneği değil, aynı zamanda bir kültür merkezi, eğitim kurumu ve sosyal yardımlaşma platformudur."</p>
+                </div>
+
+                <p>
+                    Bugün 265 dernek, 5 bölgesel birim ve binlerce gönüllü ile Fransa'nın dört bir yanına yayılmış olan DİTİB, 
+                    sadece ibadet hizmetleri sunmakla kalmıyor; aynı zamanda Kur'an eğitimleri, dil kursları, gençlik kampları, 
+                    sosyal yardımlaşma projeleri ve kültürel etkinliklerle toplumun bütünleşmesine katkıda bulunuyor. 
+                    Özellikle Cenaze Fonu projemiz ile 244.444'ten fazla üyemize ve ailelerine destek oluyoruz.
+                </p>
+
+                <div class="stats-inline">
+                    <div class="stat-inline-item">
+                        <h4>40+</h4>
+                        <p>Yıllık Deneyim</p>
+                    </div>
+                    <div class="stat-inline-item">
+                        <h4>265</h4>
+                        <p>Aktif Dernek</p>
+                    </div>
+                    <div class="stat-inline-item">
+                        <h4>50.000+</h4>
+                        <p>Yıllık Eğitim Alan Öğrenci</p>
+                    </div>
+                </div>
+
+                <p>
+                    Geleceğe bakışımızda, teknolojiyi ve modern eğitim yöntemlerini İslami değerlerle birleştirerek 
+                    yeni nesillere daha iyi hizmet etmeyi hedefliyoruz. Dijital dönüşüm projelerimiz, online eğitim 
+                    platformlarımız ve sosyal medya üzerinden ulaştığımız genç kitlelerle birlikte, İslam'ın evrensel 
+                    mesajını çağdaş bir dille aktarmaya devam ediyoruz.
+                </p>
+
+                <p>
+                    DİTİB Fameck olarak en büyük gücümüz, siz değerli gönüllülerimiz ve destekçilerimizsiniz. 
+                    Birlikte daha güçlü, birlikte daha umutluyuz. Gelecek nesillere daha güzel bir dünya bırakmak 
+                    için çalışmaya, üretmeye ve hizmet etmeye devam edeceğiz.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck " target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com " target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/ " target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com " target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://instagram.com " target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com " target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33656674269 " target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0656674269" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- ==========================================
+         DITIB LOADING TRANSITION SYSTEM
+         ========================================== -->
+    <script>
+        const DitibLoader = {
+            container: document.getElementById('ditibLoader'),
+            isTransitioning: false,
+            minDisplayTime: 2000, 
+            
+            init: function() {
+                
+                this.show();
+                document.body.classList.add('page-loading');
+                
+                
+                if (document.readyState === 'complete') {
+                    this.onPageReady();
+                } else {
+                    window.addEventListener('load', () => this.onPageReady());
+                }
+                
+               
+                this.initLinkListeners();
+            },
+            
+            show: function() {
+                this.container.classList.add('active');
+            },
+            
+            hide: function() {
+                this.container.classList.remove('active');
+            },
+            
+            onPageReady: function() {
+               
+                setTimeout(() => {
+                    this.hide();
+                   
+                    document.body.classList.remove('page-loading');
+                    document.body.classList.add('page-loaded');
+                    this.isTransitioning = false;
+                }, this.minDisplayTime);
+            },
+            
+            initLinkListeners: function() {
+                const links = document.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    
+                    
+                    if (!href || href === '#' || href.startsWith('javascript:')) return;
+                    if (href.startsWith('http') && !href.includes(window.location.hostname)) return;
+                    if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                    if (href.startsWith('#')) return;
+                    
+                    link.addEventListener('click', (e) => {
+                        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                        e.preventDefault();
+                        this.navigate(href);
+                    });
+                });
+            },
+            
+            navigate: function(url) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+                
+               
+                this.show();
+                document.body.classList.remove('page-loaded');
+                document.body.classList.add('page-loading');
+                
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 400);
+            }
+        };
+
+       
+        DitibLoader.init();
+
+        
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                DitibLoader.hide();
+                document.body.classList.remove('page-loading');
+                document.body.classList.add('page-loaded');
+            }
+        });
+    </script>
+
+    <!-- ==========================================
+         JAVASCRIPT
+         ========================================== -->
+    <script>
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            // Header scroll
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            // Scroll to top button
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+
+            // Timeline progress animation
+            const timelineSection = document.querySelector('.history-section');
+            if (timelineSection) {
+                const rect = timelineSection.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                if (rect.top < windowHeight && rect.bottom > 0) {
+                    const progress = Math.min(100, Math.max(0, ((windowHeight - rect.top) / (windowHeight + rect.height)) * 100));
+                    document.getElementById('timelineProgress').style.height = progress + '%';
+                }
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            const menuHeight = menu.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const btnRect = btn.getBoundingClientRect();
+            const availableSpace = btnRect.top;
+            
+            if (menuHeight > availableSpace - 20) {
+                menu.style.maxHeight = (availableSpace - 100) + 'px';
+                menu.style.overflowY = 'auto';
+            }
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        // Close FAB when clicking outside
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Intersection Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe timeline items
+        document.querySelectorAll('.timeline-item-new').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Observe hero stat cards
+        document.querySelectorAll('.hero-stat-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                el.style.transition = 'all 0.6s ease';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Stagger animation for stat cards
+        document.querySelectorAll('.hero-stat-card').forEach((card, index) => {
+            card.style.animationDelay = (index * 0.1) + 's';
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+    </script>
+    <!-- JAVASCRIPT END -->
+</body>
+</html>

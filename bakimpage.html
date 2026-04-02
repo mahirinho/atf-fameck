@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>DITIB Fameck - Güncelleme Aşamasında</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url('../img/arka.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ============================================
+           TOP BAR - X ÇIKARILDI
+           ============================================ */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 6px 0;
+            font-size: 12px;
+            position: relative;
+            overflow: visible;
+            z-index: 9999;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 8px;
+            overflow: visible;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 11px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            position: relative;
+            z-index: 99999;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 12px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           HEADER - KURUMSAL MENÜ EKLENDİ
+           ============================================ */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .logo-text .logo-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .nav {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        /* DROPDOWN MENÜ - KURUMSAL */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.25s ease;
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+            display: block;
+            margin-top: 8px;
+            padding: 4px 0;
+            flex-direction: column !important;
+        }
+
+        .nav-item:nth-child(2) .dropdown {
+            left: 0;
+            right: auto;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block !important;
+            width: 100%;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s ease;
+            position: relative;
+            background: var(--white);
+            line-height: 1.4;
+            box-sizing: border-box;
+            float: none;
+            clear: both;
+        }
+
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown a:hover {
+            background-color: #fafafa;
+            color: var(--primary-red);
+            padding-left: 24px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* ============================================
+           BAKIM İÇERİK ALANI - İKON KOYU MAVİ-BEYAZ
+           ============================================ */
+        .maintenance-section {
+            min-height: calc(100vh - 300px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .maintenance-container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .maintenance-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 60px 40px;
+            box-shadow: 
+                0 25px 50px rgba(26, 35, 126, 0.15),
+                0 10px 20px rgba(196, 30, 58, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .maintenance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red), var(--ditib-gold));
+        }
+
+        /* KOYU MAVİ-BEYAZ İKON - GÖRSELDEKİ GİBİ */
+        .maintenance-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #1a237e 0%, #0d1642 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(26, 35, 126, 0.4);
+            position: relative;
+        }
+
+        /* KESİKLİ ALTIN HALKA - GÖRSELDEKİ GİBİ */
+        .maintenance-icon::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 3px dashed var(--ditib-gold);
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .maintenance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(196, 30, 58, 0.1);
+            border: 1px solid rgba(196, 30, 58, 0.3);
+            color: var(--ditib-red);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--ditib-red);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .maintenance-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            color: var(--ditib-blue);
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .maintenance-title span {
+            color: var(--ditib-red);
+        }
+
+        .maintenance-text {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .maintenance-text strong {
+            color: var(--ditib-blue);
+            font-weight: 600;
+        }
+
+        /* Progress Section */
+        .progress-wrapper {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(26, 35, 126, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(26, 35, 126, 0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ditib-blue);
+        }
+
+        .progress-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ditib-gold);
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: rgba(26, 35, 126, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            border-radius: 10px;
+            width: 0%;
+            animation: progress-fill 2s ease-out forwards;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer-bar 2s infinite;
+        }
+
+        @keyframes progress-fill {
+            0% { width: 0%; }
+            100% { width: 75%; }
+        }
+
+        @keyframes shimmer-bar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Contact Info */
+        .maintenance-contact {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(26, 35, 126, 0.1);
+        }
+
+        .contact-title {
+            font-size: 13px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .contact-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: white;
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+            border: 1px solid rgba(26, 35, 126, 0.1);
+        }
+
+        .contact-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--ditib-gold);
+            color: var(--ditib-blue);
+        }
+
+        .contact-item i {
+            color: var(--ditib-red);
+            font-size: 16px;
+        }
+
+        /* Estimated Time */
+        .estimated-time {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+            border-radius: 12px;
+            border-left: 4px solid var(--ditib-gold);
+            text-align: left;
+        }
+
+        .estimated-time i {
+            color: var(--ditib-gold);
+            margin-right: 10px;
+        }
+
+        .estimated-time strong {
+            color: var(--ditib-blue);
+        }
+
+        /* ============================================
+           FOOTER - X ÇIKARILDI
+           ============================================ */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+
+        .footer-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100%;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.5);
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .footer-bottom::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ditib-gold), transparent);
+        }
+
+        .footer-bottom-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .footer-developer {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--white);
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ffffff, var(--ditib-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .footer-developer i {
+            color: var(--ditib-gold);
+            font-size: 24px;
+            -webkit-text-fill-color: var(--ditib-gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+
+            .top-bar-container {
+                justify-content: center;
+            }
+
+            .nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+
+            .nav.active {
+                display: flex;
+            }
+
+            .dropdown {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                width: 100%;
+                box-shadow: none;
+                margin-top: 10px;
+                display: none;
+            }
+
+            .nav-item:hover .dropdown {
+                display: block;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .maintenance-card {
+                padding: 40px 25px;
+            }
+
+            .maintenance-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 40px;
+            }
+
+            .contact-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .contact-item {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+
+            .footer-regional {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .footer-contact {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .footer-logos {
+                gap: 15px;
+            }
+
+            .footer-logo-circle {
+                width: 60px;
+                height: 60px;
+            }
+
+            .footer-bottom-text {
+                font-size: 12px;
+            }
+
+            .footer-developer {
+                font-size: 22px;
+                letter-spacing: 1px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .maintenance-section {
+                padding: 40px 15px;
+            }
+
+            .maintenance-card {
+                padding: 30px 20px;
+            }
+
+            .maintenance-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 35px;
+            }
+
+            .progress-wrapper {
+                padding: 20px;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- ============================================
+         TOP BAR - X ÇIKARILDI (Sadece Facebook, Instagram, YouTube)
+         ============================================ -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         HEADER - KURUMSAL DROPDOWN MENÜ EKLENDİ
+         ============================================ -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span class="logo-title">DITIB Fameck</span>
+                    <span class="logo-subtitle">Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <!-- KURUMSAL DROPDOWN MENÜ -->
+                    <div class="dropdown">
+                        <a href="Code/hakkimizda.html">Hakkımızda</a>
+                        <a href="Code/birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="Code/dernekler.html">Dernekler</a>
+                        <a href="Code/yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="Code/online-odeme.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="Code/iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ============================================
+         BAKIM İÇERİK ALANI - KOYU MAVİ-BEYAZ İKON
+         ============================================ -->
+    <section class="maintenance-section">
+        <div class="maintenance-container">
+            <div class="maintenance-card">
+                <!-- Badge -->
+                <div class="maintenance-badge">
+                    <span class="status-dot"></span>
+                    Güncelleme Aşamasında
+                </div>
+
+                <!-- KOYU MAVİ-BEYAZ İKON (Görseldeki gibi) -->
+                <div class="maintenance-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+
+                <!-- Title -->
+                <h1 class="maintenance-title">
+                    Özür Dileriz,<br>
+                    <span>Sayfamız Yenileniyor</span>
+                </h1>
+
+                <!-- Text -->
+                <p class="maintenance-text">
+                    <strong>ATF Fameck</strong> olarak sizlere daha iyi hizmet sunabilmek için 
+                    web sitemizi güncelleme ve geliştirme çalışmaları yapıyoruz. 
+                    Kısa süre içinde yeni ve geliştirilmiş içeriklerle karşınızda olacağız.
+                </p>
+
+                <!-- Progress -->
+                <div class="progress-wrapper">
+                    <div class="progress-header">
+                        <span class="progress-label">Güncelleme İlerlemesi</span>
+                        <span class="progress-value">%75</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Estimated Time -->
+                <div class="estimated-time">
+                    <i class="fas fa-clock"></i>
+                    <strong>Tahmini Tamamlanma:</strong> 48-72 saat içinde hizmetinizdeyiz.
+                </div>
+
+                <!-- Contact -->
+                <div class="maintenance-contact">
+                    <p class="contact-title">Acil Durumlar İçin Bize Ulaşın</p>
+                    <div class="contact-grid">
+                        <a href="tel:0656674269" class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>06 56 67 42 69</span>
+                        </a>
+                        <a href="mailto:ditib.fameck@gmail.com" class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>ditib.fameck@gmail.com</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="#">DİTİB FRANSA</a>
+                <a href="#">DİTİB STRASBOURG</a>
+                <a href="#">DİTİB PARİS</a>
+                <a href="#">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-text">© 2026 Designed and Developed by</div>
+            <div class="footer-developer">
+                <i class="fas fa-lion"></i>
+                Kaan Mahir Hakan
+                <i class="fas fa-lion"></i>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

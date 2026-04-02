@@ -1,0 +1,5050 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>DITIB Fameck - Fransa Diyanet İşleri Türk İslam Birliği</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css  ">
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        /* ============================================
+           NAMAZ VAKİTLERİ BUTONU
+           ============================================ */
+        
+        .prayer-times-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #0d1642 0%, #1a237e 100%);
+            border: 2px solid rgba(255,255,255,0.9);
+            color: var(--white);
+            padding: 10px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(13, 22, 66, 0.4);
+            margin-left: 15px;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .prayer-times-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(13, 22, 66, 0.5);
+            background: linear-gradient(135deg, #1a237e 0%, #0d1642 100%);
+            border-color: #ffffff;
+        }
+
+        .prayer-times-btn i {
+            font-size: 16px;
+            color: #ffffff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .prayer-countdown {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.2;
+        }
+
+        .prayer-countdown .next-prayer {
+            font-size: 10px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+
+        .prayer-countdown .time-remaining {
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Segoe UI', monospace;
+            color: #ffffff;
+        }
+
+        /* ============================================
+           NAMAZ VAKİTLERİ MODAL - BİLGİLENDİRME VERSİYONU
+           ============================================ */
+        
+        .prayer-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .prayer-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .prayer-modal {
+            background: linear-gradient(135deg, #0d1642 0%, #1a237e 100%);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s ease;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .prayer-modal-overlay.active .prayer-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .prayer-modal-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .prayer-modal-content {
+            position: relative;
+            z-index: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        .prayer-modal-header {
+            background: linear-gradient(135deg, #0d1642 0%, #1a237e 100%);
+            padding: 25px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .prayer-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            color: var(--white);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .prayer-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+            border-color: #ffffff;
+        }
+
+        .prayer-modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #ffffff;
+        }
+
+        .prayer-modal-date {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .prayer-modal-body {
+            padding: 25px;
+            color: var(--white);
+            overflow-y: auto;
+            flex: 1;
+            max-height: 60vh;
+        }
+
+        .prayer-modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .prayer-modal-body::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .prayer-modal-body::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+        .prayer-modal-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .api-notice-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .api-notice-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--ditib-gold);
+        }
+
+        .api-notice-title {
+            font-size: 18px;
+            font-weight: 700;
+                       margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .api-notice-text {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.9;
+            color: #ffffff;
+        }
+
+        .mawaqit-link-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .mawaqit-link-box i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--ditib-gold);
+        }
+
+        .mawaqit-link-box p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .prayer-modal-footer {
+            padding: 20px 25px;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .more-info-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #0d1642;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .more-info-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background: #ffffff;
+        }
+
+        .more-info-btn i {
+            font-size: 16px;
+        }
+
+        /* ============================================
+           HUTBE İNDİRME DROPDOWN
+           ============================================ */
+        
+        .download-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .download-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .download-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .download-toggle i {
+            transition: transform 0.3s;
+        }
+
+        .download-toggle.active i {
+            transform: rotate(180deg);
+        }
+
+        .download-menu {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            overflow: hidden;
+            z-index: 100;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .download-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .download-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .download-item:last-child {
+            border-bottom: none;
+        }
+
+        .download-item:hover {
+            background: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .download-item i {
+            font-size: 18px;
+            color: var(--primary-red);
+        }
+
+        /* ============================================
+           YAYINLAR KART GÜNCELLEME
+           ============================================ */
+        
+        .publication-card {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+        }
+
+        .publication-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .publication-cover {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, var(--primary-red) 0%, #8b0000 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+            text-align: center;
+            padding: 15px;
+            line-height: 1.3;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .publication-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 8px;
+        }
+
+        .publication-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+            z-index: 1;
+        }
+
+        .publication-card:hover .publication-cover::before {
+            transform: translateX(100%);
+        }
+
+        .publication-title {
+            font-size: 14px;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        /* YAYIN BAŞLIKLARI İÇİN EKLENEN STİLLER */
+        .publication-card-title {
+            font-size: 13px;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-top: 8px;
+            line-height: 1.4;
+            min-height: 36px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        /* ============================================
+           DİL SEÇİCİ STYLLERİ
+           ============================================ */
+        
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+            z-index: 99999;
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .lang-btn i {
+            font-size: 11px;
+            transition: transform 0.3s;
+        }
+
+        .lang-btn.active i {
+            transform: rotate(180deg);
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+            z-index: 999999;
+        }
+
+        .lang-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .lang-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+            background: var(--white);
+        }
+
+        .lang-item:last-child {
+            border-bottom: none;
+        }
+
+        .lang-item:hover {
+            background: #f8f9fa;
+            padding-left: 20px;
+        }
+
+        .lang-item.active {
+            background: linear-gradient(135deg, rgba(26,35,126,0.08), rgba(196,30,58,0.08));
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .lang-flag {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .lang-name {
+            font-size: 14px;
+            flex: 1;
+            color: #1a1a1a; 
+            font-weight: 500;
+        }
+
+        .lang-code {
+            font-size: 11px;
+            color: var(--text-light);
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           LOADER STYLES
+           ============================================ */
+        
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .ditib-loader.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 
+                0 20px 60px rgba(26, 35, 126, 0.15),
+                0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* Offline Screen */
+        .offline-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000000;
+            background: var(--loading-bg);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .offline-screen.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--ditib-blue), var(--ditib-red));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            margin-bottom: 30px;
+            animation: offlinePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes offlinePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 40px rgba(26, 35, 126, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 50px rgba(196, 30, 58, 0.4); }
+        }
+
+        .offline-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ditib-blue);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .offline-message {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .offline-brand {
+            font-size: 14px;
+            color: var(--ditib-red);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(196,30,58,0.4);
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(196,30,58,0.5);
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader { 
+                transition: none !important;
+            }
+            .offline-screen {
+                transition: none !important;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .loader-logo-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+            .loader-logo {
+                width: 100px;
+                height: 100px;
+            }
+            .loader-text-main {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .loader-text-sub {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+            .offline-title {
+                font-size: 22px;
+            }
+            .offline-message {
+                font-size: 14px;
+                padding: 0 20px;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url('./img/arka.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 6px 0;
+            font-size: 12px;
+            position: relative;
+            overflow: visible;
+            z-index: 9999;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 8px;
+            overflow: visible;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 11px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-left a i {
+            font-size: 11px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            position: relative;
+            z-index: 99999;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 12px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            background-image: url(img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .logo-text .logo-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .nav {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        /* ============================================
+        DROPDOWN MENÜ - DİKEY VERSİYON
+        ============================================ */
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.25s ease;
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+            display: block;
+            margin-top: 8px;
+            padding: 4px 0;
+            flex-direction: column !important;
+        }
+
+        .nav-item:nth-child(2) .dropdown {
+            left: 0;
+            right: auto;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block !important;
+            width: 100%;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s ease;
+            position: relative;
+            background: var(--white);
+            line-height: 1.4;
+            box-sizing: border-box;
+            float: none;
+            clear: both;
+        }
+
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown a:hover {
+            background-color: #fafafa;
+            color: var(--primary-red);
+            padding-left: 24px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        .hero-slider {
+            position: relative;
+            height: 75vh;
+            min-height: 500px;
+            max-height: 700px;
+            overflow: hidden;
+            background: var(--dark-bg);
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .slide-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            color: var(--white);
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.8s ease-out;
+        }
+
+        .slide.active .slide-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .slide-content h2 {
+            font-size: clamp(16px, 2vw, 20px);
+            font-weight: 400;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .slide-content h1 {
+            font-size: clamp(32px, 5vw, 60px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide-content p {
+            font-size: clamp(15px, 1.8vw, 18px);
+            max-width: 550px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(196,30,58,0.4);
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(196,30,58,0.5);
+        }
+
+        .slider-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .slider-dot.active {
+            background-color: var(--white);
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        .slider-dot:hover {
+            background-color: rgba(255,255,255,0.7);
+        }
+
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.3);
+            z-index: 10;
+        }
+
+        .slider-arrow:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slider-arrow.prev { left: 30px; }
+        .slider-arrow.next { right: 30px; }
+
+        .services-section {
+            background-image: url(img/arka.png);
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .services-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .service-card {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            padding: 15px 10px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-md);
+            background: var(--white);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 12px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--white);
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(26,35,126,0.3);
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .service-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            transition: color 0.3s;
+            line-height: 1.3;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0a1929 100%);
+            padding: 40px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(3, 29, 56);
+        }
+
+        .stats-scroll-container {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            width: fit-content;
+        }
+
+        .stats-scroll-container:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 50px;
+            color: var(--white);
+            min-width: 250px;
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 40px;
+            width: 1px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #fff, #64b5f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .section {
+            padding: 60px 0;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: clamp(26px, 3.5vw, 36px);
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+            font-weight: 800;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: clamp(15px, 1.8vw, 17px);
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .events-slider-section {
+            background-image: url(img/arka.png);
+            padding: 60px 0;
+            position: relative;
+        }
+
+        .events-slider-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .events-slider-wrapper {
+            display: flex;
+            gap: 20px;
+            overflow: hidden;
+            padding-bottom: 20px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .event-slide-card {
+            flex: 0 0 calc(25% - 15px);
+            min-width: 280px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .event-slide-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            background: var(--white);
+        }
+
+        .event-slide-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .event-slide-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        .event-date-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .event-slide-content {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0d47a1 100%);
+            padding: 25px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .event-slide-title {
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .slider-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 55px;
+            height: 55px;
+            background: var(--white);
+            border: 2px solid var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--primary-blue);
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: var(--shadow-md);
+        }
+
+        .slider-nav-btn:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        .slider-nav-btn.prev { left: -25px; }
+        .slider-nav-btn.next { right: -25px; }
+
+        .events-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .events-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .events-dot.active {
+            background: var(--primary-blue);
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .events-dot:hover {
+            background: var(--accent-blue);
+        }
+
+        .view-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            color: var(--primary-blue);
+            padding: 14px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            border: 2px solid var(--primary-blue);
+            cursor: pointer;
+        }
+
+        .view-all-btn:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(26,35,126,0.3);
+        }
+
+        .view-all-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .announcements-section {
+            background-image: url(img/arka.png);
+            padding: 60px 0;
+        }
+
+        .announcements-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .tabs-wrapper {
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: #f8f9fa;
+            padding: 6px;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            min-width: 100px;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-red), #e53935);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+
+        .tab-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab-btn.active {
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(196,30,58,0.3);
+        }
+
+        .tab-btn.active::before {
+            opacity: 1;
+        }
+
+        .tab-btn:not(.active):hover {
+            background: rgba(196,30,58,0.05);
+            color: var(--primary-red);
+        }
+
+        .tabs-content {
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .announcement-list {
+            list-style: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .announcement-item {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .announcement-item:hover {
+            background: #f8f9fa;
+            padding-left: 25px;
+        }
+
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+
+        .announcement-info h4 {
+            font-size: 15px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .announcement-item:hover .announcement-info h4 {
+            color: var(--primary-red);
+        }
+
+        .announcement-link {
+            font-size: 12px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .announcement-date {
+            font-size: 12px;
+            color: var(--text-light);
+            white-space: nowrap;
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .sermon-card {
+            background: linear-gradient(135deg, var(--primary-red) 0%, #b71c1c 100%);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .sermon-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .sermon-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .sermon-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+        }
+
+        .sermon-date-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            opacity: 0.95;
+            position: relative;
+        }
+
+        .sermon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--white);
+            color: var(--primary-red);
+            padding: 10px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .sermon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .trainings-section {
+            background-image: url(img/arka.png);
+            padding: 60px 0;
+            position: relative;
+        }
+
+        .trainings-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .trainings-grid {
+            display: flex;
+            gap: 25px;
+            overflow: hidden;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .training-card {
+            flex: 0 0 320px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .training-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            background: var(--white);
+        }
+
+        .training-image {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .training-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%);
+        }
+
+        .training-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 15px;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .training-content {
+            padding: 22px;
+        }
+
+        .training-org {
+            font-size: 12px;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .training-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            min-height: 50px;
+        }
+
+        .training-meta {
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .meta-item i {
+            color: var(--primary-blue);
+            font-size: 14px;
+            width: 18px;
+        }
+
+        .training-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-free {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: var(--white);
+        }
+
+        .tag-online {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+        }
+
+        .tag-price {
+            background: linear-gradient(135deg, var(--primary-red), #dc2626);
+            color: var(--white);
+        }
+
+        .tag-type {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: var(--white);
+        }
+
+        .activities-section {
+            background-image: url(img/arka.png);
+            padding: 60px 0;
+            position: relative;
+        }
+
+        .activities-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .activities-grid {
+            display: flex;
+            gap: 25px;
+            overflow: hidden;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        .activity-card {
+            flex: 0 0 320px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .activity-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            background: var(--white);
+        }
+
+        .activity-image {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .activity-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 6px 14px;
+            font-size: 11px;
+            border-radius: 15px;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+        }
+
+        .activity-content {
+            padding: 22px;
+        }
+
+        .activity-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            min-height: 50px;
+        }
+
+        .publications-section {
+            background-image: url(img/arka.png);
+            padding: 60px 0;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        .publications-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg  '%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .publications-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .publications-section .section-title {
+            color: var(--text-dark);
+        }
+
+        .publications-section .section-subtitle {
+            color: var(--text-dark);
+        }
+
+        .publications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 25px;
+        }
+
+        /* ============================================
+           FOOTER - GELİŞTİRİLMİŞ VERSİYON
+           ============================================ */
+        
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+
+        .footer-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100%;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        /* ============================================
+           FOOTER BOTTOM - GELİŞTİRİLMİŞ VERSİYON
+           ============================================ */
+        
+        .footer-bottom {
+            background: rgba(0,0,0,0.5);
+            padding: 20px 20px;
+            text-align: center;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .footer-bottom::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ditib-gold), transparent);
+        }
+
+        .footer-bottom-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .footer-developer {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--white);
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ffffff, var(--ditib-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .footer-developer i {
+            color: var(--ditib-gold);
+            font-size: 18px;
+            -webkit-text-fill-color: var(--ditib-gold);
+        }
+
+        @media (max-width: 768px) {
+            .footer-bottom {
+                padding: 18px 15px;
+            }
+            
+            .footer-bottom-text {
+                font-size: 11px;
+            }
+            
+            .footer-developer {
+                font-size: 18px;
+                letter-spacing: 1px;
+            }
+            
+            .footer-developer i {
+                font-size: 16px;
+            }
+        }
+
+        /* ============================================
+           FAB CONTAINER - GELİŞTİRİLMİŞ MOBİL VERSİYON
+           ============================================ */
+        
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-red), #b71c1c);
+            color: var(--white);
+            border: 3px solid rgba(255,255,255,0.3);
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 6px 25px rgba(196,30,58,0.5);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--primary-red);
+            opacity: 0.3;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-blue);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 75px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size:             14px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* ============================================
+           SCROLL TOP - GELİŞTİRİLMİŞ MOBİL VERSİYON
+           ============================================ */
+        
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--primary-blue), #0d47a1);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: 0 6px 25px rgba(26,35,126,0.5);
+            font-size: 22px;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: linear-gradient(135deg, var(--primary-red), #b71c1c);
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1200px) {
+            .event-slide-card {
+                flex: 0 0 calc(33.333% - 14px);
+            }
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .slide-content h1 {
+                font-size: 42px;
+            }
+            .announcements-container {
+                grid-template-columns: 1fr;
+            }
+            .stat-item {
+                padding: 0 30px;
+                min-width: 220px;
+            }
+            .sermon-card {
+                order: -1;
+                min-height: 350px;
+            }
+            .event-slide-card {
+                flex: 0 0 calc(50% - 10px);
+            }
+            .slider-nav-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            .hero-slider {
+                height: 60vh;
+                min-height: 450px;
+            }
+          	.slide {
+              background-image: url('../img/cami-ici-mobile.jpg')
+            }
+            .slide-content h1 {
+                font-size: 32px;
+            }
+            .slide-content h2 {
+                font-size: 16px;
+            }
+            .section-title {
+                font-size: 28px;
+            }
+            .services-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            .service-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
+            }
+            .service-title {
+                font-size: 11px;
+            }
+            .event-slide-card,
+            .training-card,
+            .activity-card {
+                flex: 0 0 85%;
+                min-width: 280px;
+            }
+            .publications-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .slider-arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            .slider-arrow.prev { left: 15px; }
+            .slider-arrow.next { right: 15px; }
+            .footer-regional {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            .footer-contact {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            .footer-logos {
+                gap: 15px;
+            }
+            .footer-logo-circle {
+                width: 60px;
+                height: 60px;
+            }
+            
+            /* MOBİL FAB GELİŞTİRMELERİ */
+            .fab-container {
+                left: 15px;
+                bottom: 25px;
+            }
+            .fab-main {
+                width: 55px;
+                height: 55px;
+                font-size: 24px;
+            }
+            .fab-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            .fab-label {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+            
+            /* MOBİL SCROLL TOP GELİŞTİRMELERİ */
+            .scroll-top {
+                right: 15px;
+                bottom: 25px;
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+            }
+            
+            /* MOBİL HUTBE DROPDOWN */
+            .download-menu {
+                min-width: 180px;
+            }
+            .download-item {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .service-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+                border-radius: 14px;
+            }
+            .service-title {
+                font-size: 10px;
+            }
+            .service-card {
+                padding: 12px 8px;
+            }
+            .publications-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .publication-cover {
+                aspect-ratio: 3/4;
+                font-size: 11px;
+            }
+            .tab-btn {
+                font-size: 12px;
+                padding: 10px 14px;
+                min-width: 80px;
+            }
+            .announcement-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .announcement-date {
+                align-self: flex-start;
+            }
+            .stat-number {
+                font-size: 32px;
+            }
+            .stat-item {
+                min-width: 180px;
+                padding: 0 25px;
+            }
+            .event-slide-card,
+            .training-card,
+            .activity-card {
+                flex: 0 0 90%;
+            }
+            
+            /* MOBİL FAB GELİŞTİRMELERİ */
+            .fab-container {
+                left: 10px;
+                bottom: 20px;
+            }
+            .fab-main {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+            }
+            .fab-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            .fab-label {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            /* MOBİL SCROLL TOP GELİŞTİRMELERİ */
+            .scroll-top {
+                right: 10px;
+                bottom: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .logo-img {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            .logo-text .logo-title {
+                font-size: 16px;
+            }
+            .logo-text .logo-subtitle {
+                font-size: 9px;
+            }
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .service-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            .fab-container {
+                left: 10px;
+                bottom: 20px;
+            }
+            .scroll-top {
+                right: 10px;
+                bottom: 20px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero-slider {
+                height: 100vh;
+                min-height: 350px;
+            }
+            .slide-content h1 {
+                font-size: 28px;
+            }
+            .fab-menu {
+                flex-direction: row;
+                bottom: 75px;
+                left: 0;
+                gap: 8px;
+            }
+            .fab-item {
+                flex-direction: column;
+            }
+            .fab-label {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .services-grid {
+                grid-template-columns: repeat(9, 1fr);
+            }
+            .event-slide-card {
+                flex: 0 0 calc(25% - 15px);
+            }
+        }
+
+        @media (max-height: 700px) {
+            .fab-menu {
+                max-height: 350px;
+                overflow-y: auto;
+            }
+            .fab-menu::-webkit-scrollbar {
+                width: 4px;
+            }
+            .fab-menu::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 2px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .service-card:hover,
+            .training-card:hover,
+            .activity-card:hover,
+            .event-slide-card:hover {
+                transform: none;
+            }
+            .btn-primary:hover,
+            .view-all-btn:hover,
+            .sermon-btn:hover {
+                transform: none;
+            }
+        }
+
+        @media print {
+            .fab-container,
+            .scroll-top,
+            .top-bar,
+            .slider-arrow,
+            .slider-controls,
+            .ditib-loader,
+            .offline-screen,
+            .lang-switcher,
+            .prayer-times-btn,
+            .prayer-modal-overlay {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            body::before {
+                display: none !important;
+            }
+        }
+      /* ============================================
+       MOBİL
+       ============================================ */
+
+    @media (max-width: 768px) {
+        
+
+        /* Events slider wrapper */
+        .events-slider-wrapper {
+            display: flex !important;
+            gap: 12px !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scroll-snap-type: x proximity !important; 
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            padding: 5px 10px 20px 10px !important;
+        }
+
+        .events-slider-wrapper::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .events-slider-wrapper .event-slide-card {
+            flex: 0 0 82% !important; 
+            min-width: 260px !important;
+            scroll-snap-align: center !important; 
+            transition: transform 0.3s ease !important;
+        }
+
+        /* Trainings grid */
+        .trainings-grid {
+            display: flex !important;
+            gap: 12px !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scroll-snap-type: x proximity !important;
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            padding: 5px 10px 20px 10px !important;
+        }
+
+        .trainings-grid::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .trainings-grid .training-card {
+            flex: 0 0 82% !important;
+            min-width: 260px !important;
+            scroll-snap-align: center !important;
+            transition: transform 0.3s ease !important;
+        }
+
+        /* Activities grid */
+        .activities-grid {
+            display: flex !important;
+            gap: 12px !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scroll-snap-type: x proximity !important;
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            padding: 5px 10px 20px 10px !important;
+        }
+
+        .activities-grid::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .activities-grid .activity-card {
+            flex: 0 0 82% !important;
+            min-width: 260px !important;
+            scroll-snap-align: center !important;
+            transition: transform 0.3s ease !important;
+        }
+
+        .footer-divider {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-direction: row !important;
+            gap: 15px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .footer-logos {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 15px !important;
+            order: 0 !important;
+        }
+
+        .footer-line {
+            flex: 1 !important;
+            max-width: 100px !important;
+            min-width: 50px !important;
+        }
+
+        .footer-logo-circle {
+            width: 70px !important;
+            height: 70px !important;
+        }
+
+        .logo-separator {
+            width: 30px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .events-slider-wrapper .event-slide-card,
+        .trainings-grid .training-card,
+        .activities-grid .activity-card {
+            flex: 0 0 85% !important;
+            min-width: 240px !important;
+        }
+
+        .footer-logo-circle {
+            width: 60px !important;
+            height: 60px !important;
+        }
+
+        .footer-line {
+            max-width: 80px !important;
+            min-width: 40px !important;
+        }
+    }
+    </style>
+</head>
+<body>
+
+    <!-- PROFESYONEL DITIB LOADING OVERLAY -->
+    <div class="ditib-loader" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="img/ATFLogo.jpg" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        
+        <div class="loader-text-main" data-tr>Yükleniyor</div>
+        <div class="loader-text-main" data-fr style="display: none;">Chargement</div>
+        <div class="loader-text-main" data-de style="display: none;">Laden</div>
+        <div class="loader-text-main" data-en style="display: none;">Loading</div>
+        
+        <div class="loader-line"></div>
+        
+        <div class="loader-text-sub" data-tr>DITIB Fameck Sunar</div>
+        <div class="loader-text-sub" data-fr style="display: none;">Présenté par DITIB Fameck</div>
+        <div class="loader-text-sub" data-de style="display: none;">Präsentiert von DITIB Fameck</div>
+        <div class="loader-text-sub" data-en style="display: none;">Presented by DITIB Fameck</div>
+        
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- İNTERNET BAĞLANTISI YOK EKRANI -->
+    <div class="offline-screen" id="offlineScreen">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        <h2 class="offline-title" data-tr>İnternet Bağlantısı Yok</h2>
+        <h2 class="offline-title" data-fr style="display: none;">Pas de Connexion Internet</h2>
+        <h2 class="offline-title" data-de style="display: none;">Keine Internetverbindung</h2>
+        <h2 class="offline-title" data-en style="display: none;">No Internet Connection</h2>
+        
+        <p class="offline-message" data-tr>Lütfen internet durumunuzu kontrol edin</p>
+        <p class="offline-message" data-fr style="display: none;">Veuillez vérifier votre connexion internet</p>
+        <p class="offline-message" data-de style="display: none;">Bitte überprüfen Sie Ihre Internetverbindung</p>
+        <p class="offline-message" data-en style="display: none;">Please check your internet connection</p>
+        
+        <button class="retry-btn" onclick="window.location.reload()">
+            <i class="fas fa-redo"></i> 
+            <span data-tr>Tekrar Dene</span>
+            <span data-fr style="display: none;">Réessayer</span>
+            <span data-de style="display: none;">Wiederholen</span>
+            <span data-en style="display: none;">Try Again</span>
+        </button>
+        
+        <div class="offline-brand" data-tr>Saygılarımızla DITIB Fameck</div>
+        <div class="offline-brand" data-fr style="display: none;">Cordialement DITIB Fameck</div>
+        <div class="offline-brand" data-de style="display: none;">Mit freundlichen Grüßen DITIB Fameck</div>
+        <div class="offline-brand" data-en style="display: none;">Best regards DITIB Fameck</div>
+    </div>
+
+    <!-- NAMAZ VAKİTLERİ MODAL - BİLGİLENDİRME VERSİYONU -->
+    <div class="prayer-modal-overlay" id="prayerModal" onclick="closePrayerModal(event)">
+        <div class="prayer-modal" onclick="event.stopPropagation()">
+            <div class="prayer-modal-bg"></div>
+            <div class="prayer-modal-content">
+                <div class="prayer-modal-header">
+                    <button class="prayer-modal-close" onclick="closePrayerModal()" aria-label="Kapat">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="prayer-modal-title">
+                        <i class="fas fa-mosque"></i>
+                        <span data-tr>Namaz Vakitleri</span>
+                        <span data-fr style="display: none;">Horaires de Prière</span>
+                        <span data-de style="display: none;">Gebetszeiten</span>
+                        <span data-en style="display: none;">Prayer Times</span>
+                    </div>
+                </div>
+                
+                <div class="prayer-modal-body">
+                    <!-- API GÜNCELLEME BİLGİLENDİRMESİ -->
+                    <div class="api-notice-box">
+                        <div class="api-notice-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="api-notice-title" data-tr>Sistem Güncellemesi</div>
+                        <div class="api-notice-title" data-fr style="display: none;">Mise à Jour du Système</div>
+                        <div class="api-notice-title" data-de style="display: none;">Systemaktualisierung</div>
+                        <div class="api-notice-title" data-en style="display: none;">System Update</div>
+                        
+                        <div class="api-notice-text" data-tr>
+                            API güncelleme aşamasında olduğundan dolayı namaz saatlerini şu anda buradan paylaşamıyoruz. 
+                            Lütfen aşağıdaki bağlantıdan namaz vakitlerine bakınız.
+                        </div>
+                        <div class="api-notice-text" data-fr style="display: none;">
+                            En raison de la mise à jour de l'API, nous ne pouvons pas partager les horaires de prière ici pour le moment.
+                            Veuillez consulter les horaires de prière via le lien ci-dessous.
+                        </div>
+                        <div class="api-notice-text" data-de style="display: none;">
+                            Aufgrund der API-Aktualisierung können wir die Gebetszeiten derzeit nicht hier teilen.
+                            Bitte sehen Sie sich die Gebetszeiten über den unten stehenden Link an.
+                        </div>
+                        <div class="api-notice-text" data-en style="display: none;">
+                            Due to API update, we cannot share prayer times here at the moment.
+                            Please check prayer times via the link below.
+                        </div>
+                    </div>
+                    
+                    <div class="mawaqit-link-box">
+                        <i class="fas fa-external-link-alt"></i>
+                        <p data-tr>MAWAQIT üzerinden namaz vakitlerini görüntüleyin</p>
+                        <p data-fr style="display: none;">Consultez les horaires de prière sur MAWAQIT</p>
+                        <p data-de style="display: none;">Sehen Sie sich die Gebetszeiten auf MAWAQIT an</p>
+                        <p data-en style="display: none;">View prayer times on MAWAQIT</p>
+                    </div>
+                </div>
+                
+                <div class="prayer-modal-footer">
+                    <a href="https://mawaqit.net/tr/m/ditib-atf-fameck-fameck-57290-france  " target="_blank" class="more-info-btn">
+                        <i class="fas fa-mosque"></i>
+                        <span data-tr>MAWAQIT'te Namaz Vakitlerine Bak</span>
+                        <span data-fr style="display: none;">Voir les Horaires sur MAWAQIT</span>
+                        <span data-de style="display: none;">Gebetszeiten auf MAWAQIT ansehen</span>
+                        <span data-en style="display: none;">View Prayer Times on MAWAQIT</span>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- TOP BAR WITH LANGUAGE SWITCHER -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.facebook.com/ATFFameck  " target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/  " target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com  " target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                
+                <!-- DİL SEÇİCİ DROPDOWN -->
+                <div class="lang-switcher" id="langSwitcher">
+                    <button class="lang-btn" onclick="toggleLangMenu(event)" aria-label="Dil Seçimi">
+                        <span id="currentFlag">🇹🇷</span>
+                        <span id="currentLangName">Türkçe</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="lang-dropdown" id="langDropdown">
+                        <div class="lang-item active" onclick="changeLanguage('tr')" data-lang="tr">
+                            <span class="lang-flag">🇹🇷</span>
+                            <span class="lang-name">Türkçe</span>
+                            <span class="lang-code">TR</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('fr')" data-lang="fr">
+                            <span class="lang-flag">🇫🇷</span>
+                            <span class="lang-name">Français</span>
+                            <span class="lang-code">FR</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('de')" data-lang="de">
+                            <span class="lang-flag">🇩🇪</span>
+                            <span class="lang-name">Deutsch</span>
+                            <span class="lang-code">DE</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('en')" data-lang="en">
+                            <span class="lang-flag">🇬🇧</span>
+                            <span class="lang-name">English</span>
+                            <span class="lang-code">EN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span class="logo-title">DITIB Fameck</span>
+                    <span class="logo-subtitle" data-tr>Diyanet İşleri Türk İslam Birliği</span>
+                    <span class="logo-subtitle" data-fr style="display: none;">Présidence des Affaires Religieuses</span>
+                    <span class="logo-subtitle" data-de style="display: none;">Präsidium für Religionsangelegenheiten</span>
+                    <span class="logo-subtitle" data-en style="display: none;">Presidency of Religious Affairs</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="index.html" data-tr>Ana Sayfa</a>
+                    <a href="index.html" data-fr style="display: none;">Accueil</a>
+                    <a href="index.html" data-de style="display: none;">Startseite</a>
+                    <a href="index.html" data-en style="display: none;">Home</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-tr>Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" data-fr style="display: none;">Institutionnel <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" data-de style="display: none;">Institutionell <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" data-en style="display: none;">Corporate <i class="fas fa-chevron-down"></i></a>
+                    <!-- DROPDOWN MENÜ - HER DİL İÇİN AYRI -->
+                    <div class="dropdown" data-tr>
+                        <a href="Code/hakkimizda.html">Hakkımızda</a>
+                        <a href="Code/birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="Code/dernekler.html">Dernekler</a>
+                        <a href="Code/yonetim.html">Yönetim</a>
+                    </div>
+                    <div class="dropdown" data-fr style="display: none;">
+                        <a href="Code/hakkimizda.html">À propos</a>
+                        <a href="Code/birimler.html">Unités Régionales DİTİB</a>
+                        <a href="Code/dernekler.html">Associations</a>
+                        <a href="Code/yonetim.html">Direction</a>
+                    </div>
+                    <div class="dropdown" data-de style="display: none;">
+                        <a href="Code/hakkimizda.html">Über uns</a>
+                        <a href="Code/birimler.html">Regionale DİTİB Einheiten</a>
+                        <a href="Code/dernekler.html">Vereine</a>
+                        <a href="Code/yonetim.html">Verwaltung</a>
+                    </div>
+                    <div class="dropdown" data-en style="display: none;">
+                        <a href="Code/hakkimizda.html">About Us</a>
+                        <a href="Code/birimler.html">Regional DİTİB Units</a>
+                        <a href="Code/dernekler.html">Associations</a>
+                        <a href="Code/yonetim.html">Management</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari  " data-tr>Cenaze Fonu</a>
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari  " data-fr style="display: none;">Fonds Funéraire</a>
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari  " data-de style="display: none;">Beerdigungsfonds</a>
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari  " data-en style="display: none;">Funeral Fund</a>
+                </div>
+                <div class="nav-item">
+                    <a href="Code/bakimpage.html" data-tr>Online Ödeme</a>
+                    <a href="Code/bakimpage.html" data-fr style="display: none;">Paiement en Ligne</a>
+                    <a href="Code/bakimpage.html" data-de style="display: none;">Online-Zahlung</a>
+                    <a href="Code/bakimpage.html" data-en style="display: none;">Online Payment</a>
+                </div>
+                <div class="nav-item">
+                    <a href="Code/iletisim.html" data-tr>İletişim</a>
+                    <a href="Code/iletisim.html" data-fr style="display: none;">Contact</a>
+                    <a href="Code/iletisim.html" data-de style="display: none;">Kontakt</a>
+                    <a href="Code/iletisim.html" data-en style="display: none;">Contact</a>
+                </div>
+                
+                <!-- NAMAZ VAKİTLERİ BUTONU -->
+                <button class="prayer-times-btn" id="prayerTimesBtn" onclick="openPrayerModal()">
+                    <i class="fas fa-mosque"></i>
+                    <div class="prayer-countdown">
+                        <span class="next-prayer" id="btnNextPrayerLabel">
+                            <span data-tr>Namaz Vakitleri</span>
+                            <span data-fr style="display: none;">Horaires</span>
+                            <span data-de style="display: none;">Gebetszeiten</span>
+                            <span data-en style="display: none;">Prayer Times</span>
+                        </span>
+                        <span class="time-remaining" id="btnCountdown">MAWAQIT</span>
+                    </div>
+                </button>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <section class="hero-slider">
+        <div class="slide active" style="background-image: url('img/cami-ici.jpg');">
+            <div class="slide-content">
+                <h2 data-tr>EN ZOR GÜNÜNÜZDE</h2>
+                <h2 data-fr style="display: none;">DANS LES MOMENTS DIFFICILES</h2>
+                <h2 data-de style="display: none;">IN SCHWIERIGEN ZEITEN</h2>
+                <h2 data-en style="display: none;">IN DIFFICULT TIMES</h2>
+                
+                <h1 data-tr>YANINIZDAYIZ</h1>
+                <h1 data-fr style="display: none;">À VOS CÔTÉS</h1>
+                <h1 data-de style="display: none;">AN IHRER SEITE</h1>
+                <h1 data-en style="display: none;">BY YOUR SIDE</h1>
+                
+                <p data-tr>Fransa DİTİB Cenaze Nakli Yardımlaşma Fonu ile sevdiklerinizin son yolculuğunda yanınızdayız.</p>
+                <p data-fr style="display: none;">Le Fonds de solidarité pour le transport funéraire DİTİB France est à vos côtés pour le dernier voyage de vos proches.</p>
+                <p data-de style="display: none;">Mit dem DİTİB Frankreich Beerdigungstransport Solidaritätsfonds sind wir an Ihrer Seite auf dem letzten Weg Ihrer Lieben.</p>
+                <p data-en style="display: none;">With the France DİTİB Funeral Transport Solidarity Fund, we are by your side on your loved ones' final journey.</p>
+                
+                <a href="#" class="btn-primary">
+                    <span data-tr>Detaylı Bilgi</span>
+                    <span data-fr style="display: none;">Plus d'infos</span>
+                    <span data-de style="display: none;">Mehr Infos</span>
+                    <span data-en style="display: none;">More Info</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="slide" style="background-image: url('img/cami-ici.jpg');">
+            <div class="slide-content">
+                <h2 data-tr>Geleceğimizin Teminatı</h2>
+                <h2 data-fr style="display: none;">L'Avenir de Notre Communauté</h2>
+                <h2 data-de style="display: none;">Die Zukunft unserer Gemeinschaft</h2>
+                <h2 data-en style="display: none;">The Future of Our Community</h2>
+                
+                <h1 data-tr>ÇOCUKLARIMIZ</h1>
+                <h1 data-fr style="display: none;">NOS ENFANTS</h1>
+                <h1 data-de style="display: none;">UNSERE KINDER</h1>
+                <h1 data-en style="display: none;">OUR CHILDREN</h1>
+                
+                <p data-tr>Değerler eğitimi ve gençlik kampları ile geleceğe emin adımlarla yürüyoruz.</p>
+                <p data-fr style="display: none;">Nous marchons vers l'avenir avec confiance grâce à l'éducation aux valeurs et aux camps de jeunesse.</p>
+                <p data-de style="display: none;">Wir gehen mit sicheren Schritten in die Zukunft durch Wertebildung und Jugendlager.</p>
+                <p data-en style="display: none;">We walk towards the future with confidence through values education and youth camps.</p>
+                
+                <a href="#" class="btn-primary">
+                    <span data-tr>Eğitimlerimiz</span>
+                    <span data-fr style="display: none;">Nos Formations</span>
+                    <span data-de style="display: none;">Unsere Bildung</span>
+                    <span data-en style="display: none;">Our Education</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="slide" style="background-image: url('img/cami-ici.jpg');">
+            <div class="slide-content">
+                <h2 data-tr>Manevi Rehberliğinizde</h2>
+                <h2 data-fr style="display: none;">Votre Guidance Spirituelle</h2>
+                <h2 data-de style="display: none;">Ihre Spirituelle Führung</h2>
+                <h2 data-en style="display: none;">Your Spiritual Guidance</h2>
+                
+                <h1 data-tr>DİN GÖREVLİLERİMİZ</h1>
+                <h1 data-fr style="display: none;">NOS AUMÔNIERS</h1>
+                <h1 data-de style="display: none;">UNSERE SEELSORGER</h1>
+                <h1 data-en style="display: none;">OUR CLERGY</h1>
+                
+                <p data-tr>265 dernek ve cami ile manevi rehberliğinizdeyiz.</p>
+                <p data-fr style="display: none;">Nous sommes à votre service spirituel avec 265 associations et mosquées.</p>
+                <p data-de style="display: none;">Wir stehen Ihnen mit 265 Vereinen und Moscheen zur spirituellen Seite.</p>
+                <p data-en style="display: none;">We provide spiritual guidance with 265 associations and mosques.</p>
+                
+                <a href="#" class="btn-primary">
+                    <span data-tr>Hizmetlerimiz</span>
+                    <span data-fr style="display: none;">Nos Services</span>
+                    <span data-de style="display: none;">Unsere Dienste</span>
+                    <span data-en style="display: none;">Our Services</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="slider-arrow prev" onclick="changeSlide(-1)" role="button" aria-label="Önceki Slide"><i class="fas fa-arrow-left"></i></div>
+        <div class="slider-arrow next" onclick="changeSlide(1)" role="button" aria-label="Sonraki Slide"><i class="fas fa-arrow-right"></i></div>
+        
+        <div class="slider-controls">
+            <div class="slider-dot active" onclick="goToSlide(0)" role="button" aria-label="Slide 1"></div>
+            <div class="slider-dot" onclick="goToSlide(1)" role="button" aria-label="Slide 2"></div>
+            <div class="slider-dot" onclick="goToSlide(2)" role="button" aria-label="Slide 3"></div>
+        </div>
+    </section>
+
+    <section class="services-section">
+        <div class="services-container">
+            <div class="services-grid">
+                <a href="pdf/kuran.pdf" class="service-card" download="kuran.pdf">
+                    <div class="service-icon"><i class="fas fa-book-quran"></i></div>
+                    <div class="service-title" data-tr>Kur'an-ı Kerim</div>
+                    <div class="service-title" data-fr style="display: none;">Coran</div>
+                    <div class="service-title" data-de style="display: none;">Koran</div>
+                    <div class="service-title" data-en style="display: none;">Quran</div>
+                </a>
+                <a href="Code/bakimpage.html" class="service-card">
+                    <div class="service-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="service-title" data-tr>Genel Bağış</div>
+                    <div class="service-title" data-fr style="display: none;">Don Général</div>
+                    <div class="service-title" data-de style="display: none;">Allgemeine Spende</div>
+                    <div class="service-title" data-en style="display: none;">General Donation</div>
+                </a>
+                <a href="Code/bakimpage.html" class="service-card">
+                    <div class="service-icon"><i class="fas fa-dove"></i></div>
+                    <div class="service-title" data-tr>Fidye</div>
+                    <div class="service-title" data-fr style="display: none;">Fidya</div>
+                    <div class="service-title" data-de style="display: none;">Fidyah</div>
+                    <div class="service-title" data-en style="display: none;">Fidyah</div>
+                </a>
+                <a href="Code/bakimpage.html" class="service-card">
+                    <div class="service-icon"><i class="fas fa-coins"></i></div>
+                    <div class="service-title" data-tr>Zekat</div>
+                    <div class="service-title" data-fr style="display: none;">Zakat</div>
+                    <div class="service-title" data-de style="display: none;">Zakat</div>
+                    <div class="service-title" data-en style="display: none;">Zakat</div>
+                </a>
+                <a href="Code/yapiliyor.html" class="service-card">
+                    <div class="service-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="service-title" data-tr>Eğitim</div>
+                    <div class="service-title" data-fr style="display: none;">Éducation</div>
+                    <div class="service-title" data-de style="display: none;">Bildung</div>
+                    <div class="service-title" data-en style="display: none;">Education</div>
+                </a>
+                <a href="Code/yapiliyor.html" class="service-card">
+                    <div class="service-icon"><i class="fas fa-calendar-star"></i></div>
+                    <div class="service-title" data-tr>Etkinlikler</div>
+                    <div class="service-title" data-fr style="display: none;">Événements</div>
+                    <div class="service-title" data-de style="display: none;">Veranstaltungen</div>
+                    <div class="service-title" data-en style="display: none;">Events</div>
+                </a>
+                <a href="https://www.yunus-emre.fr  " class="service-card">
+                    <div class="service-icon"><i class="fas fa-school"></i></div>
+                    <div class="service-title" data-tr>Yunus Emre Okulu</div>
+                    <div class="service-title" data-fr style="display: none;">École Yunus Emre</div>
+                    <div class="service-title" data-de style="display: none;">Yunus Emre Schule</div>
+                    <div class="service-title" data-en style="display: none;">Yunus Emre School</div>
+                </a>
+                <a href="https://isravoyages.fr/tr  " class="service-card">
+                    <div class="service-icon"><i class="fas fa-kaaba"></i></div>
+                    <div class="service-title" data-tr>Hac</div>
+                    <div class="service-title" data-fr style="display: none;">Hajj</div>
+                    <div class="service-title" data-de style="display: none;">Hadsch</div>
+                    <div class="service-title" data-en style="display: none;">Hajj</div>
+                </a>
+                <a href="Code/yapiliyor.html" class="service-card">
+                    <div class="service-icon"><i class="fas fa-campground"></i></div>
+                    <div class="service-title" data-tr>Kamp</div>
+                    <div class="service-title" data-fr style="display: none;">Camp</div>
+                    <div class="service-title" data-de style="display: none;">Lager</div>
+                    <div class="service-title" data-en style="display: none;">Camp</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-scroll-container">
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-mosque"></i></div>
+                <div class="stat-number">265</div>
+                <div class="stat-label" data-tr>DİTİB Dernek Sayımız</div>
+                <div class="stat-label" data-fr style="display: none;">Associations DİTİB</div>
+                <div class="stat-label" data-de style="display: none;">DİTİB Vereine</div>
+                <div class="stat-label" data-en style="display: none;">DİTİB Associations</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-sheep"></i></div>
+                <div class="stat-number">40,012</div>
+                <div class="stat-label" data-tr>2025 Vekaletle Kurban</div>
+                <div class="stat-label" data-fr style="display: none;">Sacrifices 2025</div>
+                <div class="stat-label" data-de style="display: none;">Opfer 2025</div>
+                <div class="stat-label" data-en style="display: none;">Sacrifices 2025</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number">26,312</div>
+                <div class="stat-label" data-tr>Kurs Öğrencimiz</div>
+                <div class="stat-label" data-fr style="display: none;">Élèves en Cours</div>
+                <div class="stat-label" data-de style="display: none;">Kursteilnehmer</div>
+                <div class="stat-label" data-en style="display: none;">Course Students</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-laptop"></i></div>
+                <div class="stat-number">568</div>
+                <div class="stat-label" data-tr>Online Eğitim</div>
+                <div class="stat-label" data-fr style="display: none;">Formation en Ligne</div>
+                <div class="stat-label" data-de style="display: none;">Online-Bildung</div>
+                <div class="stat-label" data-en style="display: none;">Online Education</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                <div class="stat-number">244,444</div>
+                <div class="stat-label" data-tr>Cenaze Fonu Üyesi</div>
+                <div class="stat-label" data-fr style="display: none;">Membres Fonds Funéraire</div>
+                <div class="stat-label" data-de style="display: none;">Beerdigungsfonds Mitglieder</div>
+                <div class="stat-label" data-en style="display: none;">Funeral Fund Members</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-mosque"></i></div>
+                <div class="stat-number">265</div>
+                <div class="stat-label" data-tr>DİTİB Dernek Sayımız</div>
+                <div class="stat-label" data-fr style="display: none;">Associations DİTİB</div>
+                <div class="stat-label" data-de style="display: none;">DİTİB Vereine</div>
+                <div class="stat-label" data-en style="display: none;">DİTİB Associations</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-sheep"></i></div>
+                <div class="stat-number">40,012</div>
+                <div class="stat-label" data-tr>2025 Vekaletle Kurban</div>
+                <div class="stat-label" data-fr style="display: none;">Sacrifices 2025</div>
+                <div class="stat-label" data-de style="display: none;">Opfer 2025</div>
+                <div class="stat-label" data-en style="display: none;">Sacrifices 2025</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number">26,312</div>
+                <div class="stat-label" data-tr>Kurs Öğrencimiz</div>
+                <div class="stat-label" data-fr style="display: none;">Élèves en Cours</div>
+                <div class="stat-label" data-de style="display: none;">Kursteilnehmer</div>
+                <div class="stat-label" data-en style="display: none;">Course Students</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-laptop"></i></div>
+                <div class="stat-number">568</div>
+                <div class="stat-label" data-tr>Online Eğitim</div>
+                <div class="stat-label" data-fr style="display: none;">Formation en Ligne</div>
+                <div class="stat-label" data-de style="display: none;">Online-Bildung</div>
+                <div class="stat-label" data-en style="display: none;">Online Education</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                <div class="stat-number">244,444</div>
+                <div class="stat-label" data-tr>Cenaze Fonu Üyesi</div>
+                <div class="stat-label" data-fr style="display: none;">Membres Fonds Funéraire</div>
+                <div class="stat-label" data-de style="display: none;">Beerdigungsfonds Mitglieder</div>
+                <div class="stat-label" data-en style="display: none;">Funeral Fund Members</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="events-slider-section">
+        <div class="events-slider-container">
+            <div class="section-header">
+                <h2 class="section-title" data-tr>Güncel Etkinlikler</h2>
+                <h2 class="section-title" data-fr style="display: none;">Événements Actuels</h2>
+                <h2 class="section-title" data-de style="display: none;">Aktuelle Veranstaltungen</h2>
+                <h2 class="section-title" data-en style="display: none;">Current Events</h2>
+                
+                <p class="section-subtitle" data-tr>Fameck DİTİB olarak düzenlediğimiz etkinliklerden haberdar olun</p>
+                <p class="section-subtitle" data-fr style="display: none;">Restez informé des événements organisés par DİTİB Fameck</p>
+                <p class="section-subtitle" data-de style="display: none;">Bleiben Sie über die von DİTİB Fameck organisierten Veranstaltungen informiert</p>
+                <p class="section-subtitle" data-en style="display: none;">Stay informed about events organized by DİTİB Fameck</p>
+            </div>
+            
+            <button class="slider-nav-btn prev" onclick="scrollEvents(-1)" aria-label="Önceki Etkinlikler"><i class="fas fa-arrow-left"></i></button>
+            
+            <div class="events-slider-wrapper" id="eventsSlider">
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('../img/cami-ici.jpg');">
+                        <div class="event-date-badge">19.02.2026 - 19.03.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Her gece teravihteyiz<br>inşAllah</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">Her cuma akşamı</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gençlerimizle<br>Sohbete bekleriz</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+
+                <div class="event-slide-card">
+                    <div class="event-slide-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="event-date-badge">xx.xx.2026</div>
+                    </div>
+                    <div class="event-slide-content">
+                        <h3 class="event-slide-title">Gelecek etkinliklerimiz<br>Yakında Sizlerle</h3>
+                    </div>
+                </div>
+            </div>
+
+            <button class="slider-nav-btn next" onclick="scrollEvents(1)" aria-label="Sonraki Etkinlikler"><i class="fas fa-arrow-right"></i></button>
+
+            <div class="events-pagination">
+                <div class="events-dot active" onclick="goToEventsPage(0)"></div>
+                <div class="events-dot" onclick="goToEventsPage(1)"></div>
+                <div class="events-dot" onclick="goToEventsPage(2)"></div>
+            </div>
+
+            <div class="view-all-container">
+                <a href="Code/yapiliyor.html" class="view-all-btn">
+                    <span data-tr>Tüm Etkinlikler</span>
+                    <span data-fr style="display: none;">Tous les Événements</span>
+                    <span data-de style="display: none;">Alle Veranstaltungen</span>
+                    <span data-en style="display: none;">All Events</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="announcements-section">
+        <div class="announcements-container">
+            <div class="tabs-wrapper">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab(this, 'duyurular')">
+                        <span data-tr>Duyurular</span>
+                        <span data-fr style="display: none;">Annonces</span>
+                        <span data-de style="display: none;">Ankündigungen</span>
+                        <span data-en style="display: none;">Announcements</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(this, 'mesajlar')">
+                        <span data-tr>Mesajlar</span>
+                        <span data-fr style="display: none;">Messages</span>
+                        <span data-de style="display: none;">Nachrichten</span>
+                        <span data-en style="display: none;">Messages</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab(this, 'ilahiyat')">
+                        <span data-tr>İlahiyat</span>
+                        <span data-fr style="display: none;">Théologie</span>
+                        <span data-de style="display: none;">Theologie</span>
+                        <span data-en style="display: none;">Theology</span>
+                    </button>
+                </div>
+                <div class="tabs-content" id="tabContent">
+                    <ul class="announcement-list" id="duyurular">
+                        <li class="announcement-item">
+                            <div class="announcement-info">
+                                <h4>atf-fameck.fr sitemizin açılışı</h4>
+                                <a href="#" class="announcement-link">
+                                    <span data-tr>Detay</span>
+                                    <span data-fr style="display: none;">Détail</span>
+                                    <span data-de style="display: none;">Detail</span>
+                                    <span data-en style="display: none;">Detail</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                            <span class="announcement-date">24.02.2026</span>
+                        </li>
+                        <li class="announcement-item">
+                            <div class="announcement-info">
+                                <h4>1447 - 2026 Ramazan Başlangıcı</h4>
+                                <a href="#" class="announcement-link">
+                                    <span data-tr>Detay</span>
+                                    <span data-fr style="display: none;">Détail</span>
+                                    <span data-de style="display: none;">Detail</span>
+                                    <span data-en style="display: none;">Detail</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                            <span class="announcement-date">18.02.2026</span>
+                        </li>
+                        <li class="announcement-item">
+                            <div class="announcement-info">
+                                <h4>2026 Fitre Miktarı Açıklandı</h4>
+                                <a href="#" class="announcement-link">
+                                    <span data-tr>Detay</span>
+                                    <span data-fr style="display: none;">Détail</span>
+                                    <span data-de style="display: none;">Detail</span>
+                                    <span data-en style="display: none;">Detail</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                            <span class="announcement-date">06.02.2026</span>
+                        </li>
+                        <li class="announcement-item">
+                            <div class="announcement-info">
+                                <h4>Din Görevlisi Seçme Sınavı Şubat 2026</h4>
+                                <a href="#" class="announcement-link">
+                                    <span data-tr>Detay</span>
+                                    <span data-fr style="display: none;">Détail</span>
+                                    <span data-de style="display: none;">Detail</span>
+                                    <span data-en style="display: none;">Detail</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                            <span class="announcement-date">19.01.2026</span>
+                        </li>
+                        <li class="announcement-item">
+                            <div class="announcement-info">
+                                <h4>Tiyatro Kulübü Başlıyor!</h4>
+                                <a href="#" class="announcement-link">
+                                    <span data-tr>Detay</span>
+                                    <span data-fr style="display: none;">Détail</span>
+                                    <span data-de style="display: none;">Detail</span>
+                                    <span data-en style="display: none;">Detail</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                            <span class="announcement-date">12.11.2025</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sermon-card">
+                <h3 class="sermon-title" data-tr>Haftanın Hutbesi</h3>
+                <h3 class="sermon-title" data-fr style="display: none;">Khutba de la Semaine</h3>
+                <h3 class="sermon-title" data-de style="display: none;">Khutba der Woche</h3>
+                <h3 class="sermon-title" data-en style="display: none;">Khutba of the Week</h3>
+                
+                <div class="sermon-icon">
+                    <i class="fas fa-mosque"></i>
+                </div>
+                
+                <p class="sermon-date-title">06.03.2026<br>CAMİDEN YÜKSELEN MEDENİYET</p>
+                
+                <a href="Code/hutbe.html" class="sermon-btn">
+                    <span data-tr>Tümünü Gör</span>
+                    <span data-fr style="display: none;">Voir Tout</span>
+                    <span data-de style="display: none;">Alle Ansehen</span>
+                    <span data-en style="display: none;">View All</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                
+                <!-- HUTBE İNDİRME DROPDOWN -->
+                <div class="download-dropdown">
+                    <div class="download-toggle" onclick="toggleDownloadMenu(event)">
+                        <span data-tr>İndirme Seçenekleri</span>
+                        <span data-fr style="display: none;">Options de Téléchargement</span>
+                        <span data-de style="display: none;">Download-Optionen</span>
+                        <span data-en style="display: none;">Download Options</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="download-menu" id="downloadMenu">
+                        <a href="pdf/hutbeler/turkce/06mart2026.pdf" class="download-item" download>
+                            <i class="fas fa-file-pdf"></i>
+                            <span data-tr>Türkçe PDF</span>
+                            <span data-fr style="display: none;">PDF Turc</span>
+                            <span data-de style="display: none;">Türkisch PDF</span>
+                            <span data-en style="display: none;">Turkish PDF</span>
+                        </a>
+                        <a href="pdf/hutbeler/fransizca/6mars2026.pdf" class="download-item" download>
+                            <i class="fas fa-file-pdf"></i>
+                            <span data-tr>Fransızca PDF</span>
+                            <span data-fr style="display: none;">PDF Français</span>
+                            <span data-de style="display: none;">Französisch PDF</span>
+                            <span data-en style="display: none;">French PDF</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trainings-section">
+        <div class="trainings-container">
+            <div class="section-header">
+                <h2 class="section-title" data-tr>Eğitimlerimiz</h2>
+                <h2 class="section-title" data-fr style="display: none;">Nos Formations</h2>
+                <h2 class="section-title" data-de style="display: none;">Unsere Bildung</h2>
+                <h2 class="section-title" data-en style="display: none;">Our Trainings</h2>
+                
+                <p class="section-subtitle" data-tr>Geleneksel ve online eğitimlerimizle kendinizi geliştirin</p>
+                <p class="section-subtitle" data-fr style="display: none;">Développez-vous avec nos formations traditionnelles et en ligne</p>
+                <p class="section-subtitle" data-de style="display: none;">Entwickeln Sie sich mit unserer traditionellen und Online-Bildung</p>
+                <p class="section-subtitle" data-en style="display: none;">Develop yourself with our traditional and online education</p>
+            </div>
+
+            <button class="slider-nav-btn prev" onclick="scrollTrainings(-1)" aria-label="Önceki Eğitimler" style="top: 55%;"><i class="fas fa-arrow-left"></i></button>
+
+            <div class="trainings-grid" id="trainingsGrid">
+                <div class="training-card">
+                    <div class="training-image" style="background-image: url('img/cenaze-yikama.png');">
+                        <div class="training-badge" data-tr>Hepinizi bekleriz</div>
+                        <div class="training-badge" data-fr style="display: none;">Places Limitées</div>
+                        <div class="training-badge" data-de style="display: none;">Begrenzte Plätze</div>
+                        <div class="training-badge" data-en style="display: none;">Limited Seats</div>
+                    </div>
+                    <div class="training-content">
+                        <div class="training-org">DITIB Fameck</div>
+                        <h3 class="training-title">Cenaze yıkama dersi</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>10.01.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Saat: 10:00 - 15:30</span>
+                                <span data-fr style="display: none;">Heure: 10:00 - 15:30</span>
+                                <span data-de style="display: none;">Stunde: 10:00 - 15:30</span>
+                                <span data-en style="display: none;">Hour: 10:00 - 15:30</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>Ücretsiz</span>
+                            <span class="tag tag-free" data-fr style="display: none;">Gratuit</span>
+                            <span class="tag tag-free" data-de style="display: none;">Kostenlos</span>
+                            <span class="tag tag-free" data-en style="display: none;">Free</span>
+                            
+                            <span class="tag tag-online">Fiziksel katılım</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="training-card">
+                    <div class="training-image" style="background-image: url('img/cami-ici.jpg');"></div>
+                    <div class="training-content">
+                        <div class="training-org">DITIB Fameck</div>
+                        <h3 class="training-title" data-tr>Eğitimlerimiz yakında sizlerle…</h3>
+                        <h3 class="training-title" data-fr style="display: none;">Nos cours arrivent bientôt…</h3>
+                        <h3 class="training-title" data-de style="display: none;">Unsere Kurse stehen bald für Sie bereit…</h3>
+                        <h3 class="training-title" data-en style="display: none;">Our courses are coming soon…</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>xx.xx.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Saat: xx:xx</span>
+                                <span data-fr style="display: none;">Heure: xx:xx</span>
+                                <span data-de style="display: none;">Stunde: xx:xx</span>
+                                <span data-en style="display: none;">Hour: xx:xx</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>Ücretsiz</span>
+                            <span class="tag tag-free" data-fr style="display: none;">Gratuit</span>
+                            <span class="tag tag-free" data-de style="display: none;">Kostenlos</span>
+                            <span class="tag tag-free" data-en style="display: none;">Free</span>
+                            
+                            <span class="tag tag-online">Fiziksel katılım</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="training-card">
+                    <div class="training-image" style="background-image: url('img/cami-ici.jpg');"></div>
+                    <div class="training-content">
+                        <div class="training-org">DITIB Fameck</div>
+                        <h3 class="training-title" data-tr>Eğitimlerimiz yakında sizlerle…</h3>
+                        <h3 class="training-title" data-fr style="display: none;">Nos cours arrivent bientôt…</h3>
+                        <h3 class="training-title" data-de style="display: none;">Unsere Kurse stehen bald für Sie bereit…/h3>
+                        <h3 class="training-title" data-en style="display: none;">Our courses are coming soon…</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>x.xx.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Saat: xx:xx</span>
+                                <span data-fr style="display: none;">Heure: xx:xx</span>
+                                <span data-de style="display: none;">Stunde: xx:xx</span>
+                                <span data-en style="display: none;">Hour: xx:xx</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>Ücretsiz</span>
+                            <span class="tag tag-free" data-fr style="display: none;">Gratuit</span>
+                            <span class="tag tag-free" data-de style="display: none;">Kostenlos                            </span>
+                            <span class="tag tag-free" data-en style="display: none;">Free</span>
+                            
+                            <span class="tag tag-online">Fiziksel katılım</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="training-card">
+                    <div class="training-image" style="background-image: url('img/cami-ici.jpg');"></div>
+                    <div class="training-content">
+                        <div class="training-org">DITIB Fameck</div>
+                        <h3 class="training-title" data-tr>Eğitimlerimiz yakında sizlerle…</h3>
+                        <h3 class="training-title" data-fr style="display: none;">Nos cours arrivent bientôt…</h3>
+                        <h3 class="training-title" data-de style="display: none;">Unsere Kurse stehen bald für Sie bereit…</h3>
+                        <h3 class="training-title" data-en style="display: none;">Our courses are coming soon…</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>xx.xx.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Saat: xx:xx</span>
+                                <span data-fr style="display: none;">Heure: xx:xx</span>
+                                <span data-de style="display: none;">Stunde: xx:xx</span>
+                                <span data-en style="display: none;">Hour: xx:xx</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>Ücretsiz</span>
+                            <span class="tag tag-free" data-fr style="display: none;">Gratuit</span>
+                            <span class="tag tag-free" data-de style="display: none;">Kostenlos</span>
+                            <span class="tag tag-free" data-en style="display: none;">Free</span>
+                            
+                            <span class="tag tag-online">Fiziksel katılım</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="slider-nav-btn next" onclick="scrollTrainings(1)" aria-label="Sonraki Eğitimler" style="top: 55%;"><i class="fas fa-arrow-right"></i></button>
+
+            <div class="view-all-container">
+                <a href="Code/yapiliyor.html" class="view-all-btn">
+                    <span data-tr>Tüm Eğitimler</span>
+                    <span data-fr style="display: none;">Toutes les Formations</span>
+                    <span data-de style="display: none;">Alle Bildungsgänge</span>
+                    <span data-en style="display: none;">All Trainings</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="activities-section">
+        <div class="activities-container">
+            <div class="section-header">
+                <h2 class="section-title" data-tr>Etkinlikler</h2>
+                <h2 class="section-title" data-fr style="display: none;">Activités</h2>
+                <h2 class="section-title" data-de style="display: none;">Aktivitäten</h2>
+                <h2 class="section-title" data-en style="display: none;">Activities</h2>
+                
+                <p class="section-subtitle" data-tr>Kültürel ve sosyal etkinliklerimizle bir araya geliyoruz</p>
+                <p class="section-subtitle" data-fr style="display: none;">Nous nous réunissons avec nos activités culturelles et sociales</p>
+                <p class="section-subtitle" data-de style="display: none;">Wir kommen mit unseren kulturellen und sozialen Aktivitäten zusammen</p>
+                <p class="section-subtitle" data-en style="display: none;">We come together with our cultural and social activities</p>
+            </div>
+
+            <button class="slider-nav-btn prev" onclick="scrollActivities(-1)" aria-label="Önceki Etkinlikler" style="top: 55%;"><i class="fas fa-arrow-left"></i></button>
+
+            <div class="activities-grid" id="activitiesGrid">
+                <div class="activity-card">
+                    <div class="activity-image" style="background-image: url('img/namaz.jpg');">
+                        <div class="activity-badge" data-tr>Namaz Programı</div>
+                        <div class="activity-badge" data-fr style="display: none;">Programme des prières</div>
+                        <div class="activity-badge" data-de style="display: none;">Gebetsplan</div>
+                        <div class="activity-badge" data-en style="display: none;">Prayer Schedule</div>
+                    </div>
+                    <div class="activity-content">
+                        <h3 class="activity-title" data-tr>Teravih Programı</h3>
+                        <h3 class="activity-title" data-fr style="display: none;">Programme de Tarawih</h3>
+                        <h3 class="activity-title" data-de style="display: none;">Tarawih-Programm</h3>
+                        <h3 class="activity-title" data-en style="display: none;">Tarawih Program</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>19.02.2026 - 19.03.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Saat kaçta?: 20:15</span>
+                                <span data-fr style="display: none;">A quelle heure: 20:15</span>
+                                <span data-de style="display: none;">Wann?: 20:15</span>
+                                <span data-en style="display: none;">When?: 20:15</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>Herkese açık</span>
+                            <span class="tag tag-free" data-fr style="display: none;">Ouvert à tous</span>
+                            <span class="tag tag-free" data-de style="display: none;">Für alle offen</span>
+                            <span class="tag tag-free" data-en style="display: none;">Open to everyone</span>
+                            
+                            <span class="tag tag-type" data-tr>Namaz</span>
+                            <span class="tag tag-type" data-fr style="display: none;">Prière</span>
+                            <span class="tag tag-type" data-de style="display: none;">Gebet</span>
+                            <span class="tag tag-type" data-en style="display: none;">Prayer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-image" style="background-image: url('img/iftar-belediye.jpg');">
+                        <div class="activity-badge" data-tr>Iftar programı</div>
+                        <div class="activity-badge" data-fr style="display: none;">Programme de l’Iftar</div>
+                        <div class="activity-badge" data-de style="display: none;">Iftar-Programm</div>
+                        <div class="activity-badge" data-en style="display: none;">Iftar Program</div>
+                    </div>
+                    <div class="activity-content">
+                        <h3 class="activity-title" data-tr>Belediye heyetiyle iftar programı</h3>
+                        <h3 class="activity-title" data-fr style="display: none;">Programme de l’iftar avec les responsables municipaux</h3>
+                        <h3 class="activity-title" data-de style="display: none;">Iftar-Programm mit den städtischen Vertretern</h3>
+                        <h3 class="activity-title" data-en style="display: none;">Iftar program with the city officials</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>06.03.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Saat kaçta?: 18:30</span>
+                                <span data-fr style="display: none;">A quelle heure?: 18:30</span>
+                                <span data-de style="display: none;">Wann?: 18:30</span>
+                                <span data-en style="display: none;">When?: 18:30</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>İzin gerekli</span>
+                            <span class="tag tag-free" data-fr style="display: none;">Autorisation nécessaire</span>
+                            <span class="tag tag-free" data-de style="display: none;">Genehmigung erforderlich</span>
+                            <span class="tag tag-free" data-en style="display: none;">Permission required</span>
+                            
+                            <span class="tag tag-type" data-tr>Iftar</span>
+                            <span class="tag tag-type" data-fr style="display: none;">Iftar</span>
+                            <span class="tag tag-type" data-de style="display: none;">Iftar</span>
+                            <span class="tag tag-type" data-en style="display: none;">Iftar</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="activity-badge">Gelecek <span data-tr>Etkinlikler</span><span data-fr style="display: none;">Ans</span><span data-de style="display: none;">Jahre</span><span data-en style="display: none;">Years</span></div>
+                    </div>
+                    <div class="activity-content">
+                        <h3 class="activity-title" data-tr>Gelecek Etkinlikler...</h3>
+                        <h3 class="activity-title" data-fr style="display: none;">Evénements à venir...</h3>
+                        <h3 class="activity-title" data-de style="display: none;">Kommende Veranstaltungen...</h3>
+                        <h3 class="activity-title" data-en style="display: none;">Upcoming events...</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>xx.xx.2026 - xx.xx.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Son Başvuru: xx:xx</span>
+                                <span data-fr style="display: none;">Date Limite: xx:xx</span>
+                                <span data-de style="display: none;">Bewerbungsschluss: xx:xx</span>
+                                <span data-en style="display: none;">Deadline: xx:xx</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span data-tr>69 A Rue de la Centrale, Fameck</span>
+                                <span data-fr style="display: none;">69 A Rue de la Centrale, Fameck</span>
+                                <span data-de style="display: none;">69 A Rue de la Centrale, Fameck</span>
+                                <span data-en style="display: none;">69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-price">x</span>
+                            
+                            <span class="tag tag-type" data-tr>x</span>
+                            <span class="tag tag-type" data-fr style="display: none;">x</span>
+                            <span class="tag tag-type" data-de style="display: none;">x</span>
+                            <span class="tag tag-type" data-en style="display: none;">x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-image" style="background-image: url('img/cami-ici.jpg');">
+                        <div class="activity-badge" data-tr>Gelecek Etkinlikler...</div>
+                        <div class="activity-badge" data-fr style="display: none;">Evénements à venir...</div>
+                        <div class="activity-badge" data-de style="display: none;">Kommende Veranstaltungen...</div>
+                        <div class="activity-badge" data-en style="display: none;">Upcoming events...</div>
+                    </div>
+                    <div class="activity-content">
+                        <h3 class="activity-title" data-tr>Gelecek Etkinlikler...</h3>
+                        <h3 class="activity-title" data-fr style="display: none;">Evénements à venir...</h3>
+                        <h3 class="activity-title" data-de style="display: none;">Kommende Veranstaltungen...</h3>
+                        <h3 class="activity-title" data-en style="display: none;">Upcoming events...</h3>
+                        <div class="training-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-alt"></i>
+                                <span>xx.xx.2026</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span data-tr>Son Başvuru: xx.xx</span>
+                                <span data-fr style="display: none;">Date Limite: xx.xx</span>
+                                <span data-de style="display: none;">Bewerbungsschluss: xx.xx</span>
+                                <span data-en style="display: none;">Deadline: xx.xx</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>69 A Rue de la Centrale, Fameck</span>
+                            </div>
+                        </div>
+                        <div class="training-tags">
+                            <span class="tag tag-free" data-tr>x</span>
+                            <span class="tag tag-free" data-fr style="display: none;">x</span>
+                            <span class="tag tag-free" data-de style="display: none;">x</span>
+                            <span class="tag tag-free" data-en style="display: none;">x</span>
+                            
+                            <span class="tag tag-type" data-tr>x</span>
+                            <span class="tag tag-type" data-fr style="display: none;">x</span>
+                            <span class="tag tag-type" data-de style="display: none;">x</span>
+                            <span class="tag tag-type" data-en style="display: none;">x</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="slider-nav-btn next" onclick="scrollActivities(1)" aria-label="Sonraki Etkinlikler" style="top: 55%;"><i class="fas fa-arrow-right"></i></button>
+
+            <div class="view-all-container">
+                <a href="Code/yapiliyor.html" class="view-all-btn">
+                    <span data-tr>Tüm Etkinlikler</span>
+                    <span data-fr style="display: none;">Toutes les Activités</span>
+                    <span data-de style="display: none;">Alle Aktivitäten</span>
+                    <span data-en style="display: none;">All Activities</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="publications-section">
+        <div class="publications-container">
+            <div class="section-header">
+                <h2 class="section-title" data-tr>Yayınlarımız</h2>
+                <h2 class="section-title" data-fr style="display: none;">Nos Publications</h2>
+                <h2 class="section-title" data-de style="display: none;">Unsere Publikationen</h2>
+                <h2 class="section-title" data-en style="display: none;">Our Publications</h2>
+                
+                <p class="section-subtitle" data-tr>Dini ve kültürel yayınlarımızdan yararlanın</p>
+                <p class="section-subtitle" data-fr style="display: none;">Profitez de nos publications religieuses et culturelles</p>
+                <p class="section-subtitle" data-de style="display: none;">Nutzen Sie unsere religiösen und kulturellen Publikationen</p>
+                <p class="section-subtitle" data-en style="display: none;">Benefit from our religious and cultural publications</p>
+            </div>
+
+            <div class="publications-grid">
+                <a href="../pdf/japprendsmonprophete.pdf" class="publication-card" download>
+                    <div class="publication-cover">
+                        <img src="img/yayinlar/japprendsmonprophete.png" alt="Aile Dergisi" onerror="this.style.display='none'; this.parentElement.innerHTML='AİLE<br>DERGİSİ'">
+                    </div>
+                    <div class="publication-title" data-tr>Aylık Dergi</div>
+                    <div class="publication-title" data-fr style="display: none;">Magazine Mensuel</div>
+                    <div class="publication-title" data-de style="display: none;">Monatszeitschrift</div>
+                    <div class="publication-title" data-en style="display: none;">Monthly Magazine</div>
+                    <!-- YAYIN BAŞLIĞI -->
+                    <div class="publication-card-title">J'apprends mon prophète</div>
+                </a>
+                <a href="../pdf/Sur-les-traces-du-prophete.pdf" class="publication-card" download>
+                    <div class="publication-cover">
+                        <img src="img/yayinlar/Sur-les-traces-du-prophete.png" alt="Çocuk Dergisi" onerror="this.style.display='none'; this.parentElement.innerHTML='ÇOCUK<br>DERGİSİ'">
+                    </div>
+                    <div class="publication-title" data-tr>Çocuk Dergisi</div>
+                    <div class="publication-title" data-fr style="display: none;">Magazine Enfants</div>
+                    <div class="publication-title" data-de style="display: none;">Kinderzeitschrift</div>
+                    <div class="publication-title" data-en style="display: none;">Children's Magazine</div>
+                    <!-- YAYIN BAŞLIĞI -->
+                    <div class="publication-card-title">Sur les traces du prophète</div>
+                </a>
+                <a href="pdf/fonder-une-famille.pdf" class="publication-card" download>
+                    <div class="publication-cover">
+                        <img src="img/yayinlar/fonder-une-famille.png" alt="İlmi Dergi" onerror="this.style.display='none'; this.parentElement.innerHTML='İLMİ<br>DERGİ'">
+                    </div>
+                    <div class="publication-title" data-tr>İlmi Dergi</div>
+                    <div class="publication-title" data-fr style="display: none;">Revue Scientifique</div>
+                    <div class="publication-title" data-de style="display: none;">Wissenschaftliche Zeitschrift</div>
+                    <div class="publication-title" data-en style="display: none;">Scientific Journal</div>
+                    <!-- YAYIN BAŞLIĞI -->
+                    <div class="publication-card-title">Bir aile kurmak</div>
+                </a>
+                <a href="pdf/les-fatwas.pdf" class="publication-card" download>
+                    <div class="publication-cover">
+                        <img src="img/yayinlar/les-fatwas.png" alt="Geçerken" onerror="this.style.display='none'; this.parentElement.innerHTML='GEÇERKEN'">
+                    </div>
+                    <div class="publication-title">Geçerken</div>
+                    <!-- YAYIN BAŞLIĞI -->
+                    <div class="publication-card-title">Fetvalar</div>
+                </a>
+                <a href="pdf/bonjour-a-la-vie.pdf" class="publication-card" download>
+                    <div class="publication-cover">
+                        <img src="img/yayinlar/bonjour-a-la-vie.png" alt="İbadet Rehberi" onerror="this.style.display='none'; this.parentElement.innerHTML='İBADET<br>REHBERİ'">
+                    </div>
+                    <div class="publication-title" data-tr>İbadet Rehberi</div>
+                    <div class="publication-title" data-fr style="display: none;">Guide de Culte</div>
+                    <div class="publication-title" data-de style="display: none;">Anleitung zum Gottesdienst</div>
+                    <div class="publication-title" data-en style="display: none;">Worship Guide</div>
+                    <!-- YAYIN BAŞLIĞI -->
+                    <div class="publication-card-title">Hayata merhaba</div>
+                </a>
+                <a href="pdf/japprends-mon-livre.pdf" class="publication-card" download>
+                    <div class="publication-cover">
+                        <img src="img/yayinlar/japprends-mon-livre.png" alt="Hayata Merhaba" onerror="this.style.display='none'; this.parentElement.innerHTML='HAYATA<br>MERHABA'">
+                    </div>
+                    <div class="publication-title" data-tr>Hayata Merhaba</div>
+                    <div class="publication-title" data-fr style="display: none;">Bonjour la Vie</div>
+                    <div class="publication-title" data-de style="display: none;">Hallo Leben</div>
+                    <div class="publication-title" data-en style="display: none;">Hello Life</div>
+                    <!-- YAYIN BAŞLIĞI -->
+                    <div class="publication-card-title">Kitabımı öğreniyorum</div>
+                </a>
+            </div>
+
+            <div class="view-all-container" style="margin-top: 40px;">
+                <a href="Code/yapiliyor.html" class="btn-primary">
+                    <span data-tr>Tüm Yayınlar</span>
+                    <span data-fr style="display: none;">Toutes les Publications</span>
+                    <span data-de style="display: none;">Alle Publikationen</span>
+                    <span data-en style="display: none;">All Publications</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck  " target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/  " target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com  " target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr  ">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr  ">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr  ">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr  ">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="img/ATFLogo.jpg" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="img/ATFLogo2.png" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span data-tr>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                    <span data-fr style="display: none;">Lun-Ven 09:30 - 12:30 / 13:30 - 17:30</span>
+                    <span data-de style="display: none;">Mo-Fr 09:30 - 12:30 / 13:30 - 17:30</span>
+                    <span data-en style="display: none;">Mon-Fri 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER BOTTOM -->
+        <div class="footer-bottom">
+            <div class="footer-bottom-text">© 2026 Designed and Developed by</div>
+            <div class="footer-developer">
+                <i class="fas fa-lion"></i>
+                Kaan Mahir Hakan
+                <i class="fas fa-lion"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FAB CONTAINER -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://www.instagram.com/atf_fameck/  " target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+                <span class="fab-label">Instagram</span>
+            </a>
+            <a href="https://youtube.com  " target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+                <span class="fab-label">YouTube</span>
+            </a>
+            <a href="https://wa.me/33656674269  " target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+                <span class="fab-label">WhatsApp</span>
+            </a>
+            <a href="tel:0656674269" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label" data-tr>Bizi Arayın</span>
+                <span class="fab-label" data-fr style="display: none;">Appelez-nous</span>
+                <span class="fab-label" data-de style="display: none;">Rufen Sie uns an</span>
+                <span class="fab-label" data-en style="display: none;">Call Us</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- SCROLL TOP -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ============================================
+        // NAMAZ VAKİTLERİ MODAL
+        // ============================================
+        
+        function openPrayerModal() {
+            const modal = document.getElementById('prayerModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePrayerModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('prayerModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ============================================
+        // HUTBE İNDİRME DROPDOWN
+        // ============================================
+        
+        function toggleDownloadMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('downloadMenu');
+            const toggle = event.currentTarget;
+            
+            menu.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // ============================================
+        // DİL YÖNETİM SİSTEMİ
+        // ============================================
+
+        const DitibLang = {
+            current: localStorage.getItem('ditib_lang') || 'tr',
+            
+            data: {
+                tr: { flag: '🇹🇷', name: 'Türkçe', code: 'TR' },
+                fr: { flag: '🇫🇷', name: 'Français', code: 'FR' },
+                de: { flag: '🇩🇪', name: 'Deutsch', code: 'DE' },
+                en: { flag: '🇬🇧', name: 'English', code: 'EN' }
+            },
+
+            init() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlLang = urlParams.get('lang');
+                
+                if (urlLang && this.data[urlLang]) {
+                    this.current = urlLang;
+                    localStorage.setItem('ditib_lang', urlLang);
+                }
+                
+                this.updatePage();
+                this.updateButton();
+                document.documentElement.lang = this.current;
+            },
+
+            updatePage() {
+               
+                document.querySelectorAll('[data-tr], [data-fr], [data-de], [data-en]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                
+                document.querySelectorAll(`[data-${this.current}]`).forEach(el => {
+                    const tag = el.tagName.toLowerCase();
+                    const inlineTags = ['a', 'span', 'strong', 'em', 'i', 'b', 'small', 'label'];
+                    
+                    if (inlineTags.includes(tag)) {
+                        el.style.display = 'inline';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                });
+            },
+
+            updateButton() {
+                const flag = document.getElementById('currentFlag');
+                const name = document.getElementById('currentLangName');
+                
+                if (flag) flag.textContent = this.data[this.current].flag;
+                if (name) name.textContent = this.data[this.current].name;
+                
+                document.querySelectorAll('.lang-item').forEach(item => {
+                    const lang = item.getAttribute('data-lang');
+                    item.classList.toggle('active', lang === this.current);
+                });
+            },
+
+            change(lang) {
+                if (!this.data[lang] || lang === this.current) return;
+                
+                this.current = lang;
+                localStorage.setItem('ditib_lang', lang);
+                
+                const url = new URL(window.location);
+                url.searchParams.set('lang', lang);
+                window.history.pushState({}, '', url);
+                
+                this.updatePage();
+                this.updateButton();
+                document.documentElement.lang = lang;
+                this.closeMenu();
+            },
+
+            toggle(e) {
+                e.stopPropagation();
+                const menu = document.getElementById('langDropdown');
+                const btn = document.querySelector('.lang-btn');
+                
+                menu.classList.toggle('active');
+                btn.classList.toggle('active');
+            },
+
+            closeMenu() {
+                const menu = document.getElementById('langDropdown');
+                const btn = document.querySelector('.lang-btn');
+                if (menu) menu.classList.remove('active');
+                if (btn) btn.classList.remove('active');
+            }
+        };
+
+        // ============================================
+        // GLOBAL FONKSİYONLAR
+        // ============================================
+
+        function toggleLangMenu(e) {
+            DitibLang.toggle(e);
+        }
+
+        function changeLanguage(lang) {
+            DitibLang.change(lang);
+        }
+
+        function initLanguage() {
+            DitibLang.init();
+        }
+
+        // ============================================
+        // LOADER SYSTEM
+        // ============================================
+        
+        const DitibLoader = {
+            container: document.getElementById('ditibLoader'),
+            offlineScreen: document.getElementById('offlineScreen'),
+            isTransitioning: false,
+            minDisplayTime: 1500,
+            startTime: 0,
+            
+            init: function() {
+                this.show();
+                this.startTime = Date.now();
+                this.checkConnection();
+                
+                if (document.readyState === 'complete') {
+                    this.onPageReady();
+                } else {
+                    window.addEventListener('load', () => this.onPageReady());
+                }
+                
+                window.addEventListener('online', () => this.handleOnline());
+                window.addEventListener('offline', () => this.handleOffline());
+            },
+            
+            checkConnection: function() {
+                if (!navigator.onLine) {
+                    this.handleOffline();
+                }
+            },
+            
+            handleOffline: function() {
+                this.hide();
+                this.offlineScreen.classList.add('visible');
+            },
+            
+            handleOnline: function() {
+                this.offlineScreen.classList.remove('visible');
+                window.location.reload();
+            },
+            
+            show: function() {
+                this.container.classList.add('visible');
+            },
+            
+            hide: function() {
+                this.container.classList.remove('visible');
+            },
+            
+            onPageReady: function() {
+                const elapsed = Date.now() - this.startTime;
+                const remaining = Math.max(0, this.minDisplayTime - elapsed);
+                
+                setTimeout(() => {
+                    this.hide();
+                    DitibLang.init();
+                }, remaining);
+            },
+            
+            navigate: function(url) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+                
+                this.show();
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 400);
+            }
+        };
+
+        function initDitibTransitions() {
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
+                if (href.startsWith('http') && !href.includes(window.location.hostname)) return;
+                if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                if (href.startsWith('#')) return;
+                
+                link.addEventListener('click', function(e) {
+                    if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                    e.preventDefault();
+                    DitibLoader.navigate(href);
+                });
+            });
+        }
+
+        // ============================================
+        // SLIDER SYSTEM
+        // ============================================
+        
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const totalSlides = slides.length;
+        let slideInterval;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+
+        function changeSlide(direction) {
+            let newIndex = currentSlide + direction;
+            if (newIndex >= totalSlides) newIndex = 0;
+            if (newIndex < 0) newIndex = totalSlides - 1;
+            showSlide(newIndex);
+            resetInterval();
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => {
+                changeSlide(1);
+            }, 5000);
+        }
+
+        // ============================================
+        // EVENTS SLIDER
+        // ============================================
+        
+        let currentEventsPage = 0;
+        const totalEventsPages = 3;
+
+        function goToEventsPage(page) {
+            currentEventsPage = page;
+            const dots = document.querySelectorAll('.events-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === page);
+            });
+            const slider = document.getElementById('eventsSlider');
+            const cardWidth = slider.querySelector('.event-slide-card').offsetWidth + 20;
+            slider.scrollTo({
+                left: page * cardWidth * 4,
+                behavior: 'smooth'
+            });
+        }
+      
+        function scrollEvents(direction) {
+            const slider = document.getElementById('eventsSlider');
+            const cardWidth = slider.querySelector('.event-slide-card').offsetWidth + 12;
+            slider.scrollBy({
+                left: direction * cardWidth * 0.8, // kart genişliğinin %80'i kadar kaydır
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollTrainings(direction) {
+            const grid = document.getElementById('trainingsGrid');
+            const cardWidth = grid.querySelector('.training-card').offsetWidth + 12;
+            grid.scrollBy({
+                left: direction * cardWidth * 0.8,
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollActivities(direction) {
+            const grid = document.getElementById('activitiesGrid');
+            const cardWidth = grid.querySelector('.activity-card').offsetWidth + 12;
+            grid.scrollBy({
+                left: direction * cardWidth * 0.8,
+                behavior: 'smooth'
+            });
+        }
+
+        // ============================================
+        // FAB MENU
+        // ============================================
+        
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            const menuHeight = menu.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const btnRect = btn.getBoundingClientRect();
+            const availableSpace = btnRect.top;
+            
+            if (menuHeight > availableSpace - 20) {
+                menu.style.maxHeight = (availableSpace - 100) + 'px';
+                menu.style.overflowY = 'auto';
+            }
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        // ============================================
+        // SCROLL & NAVIGATION
+        // ============================================
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.getElementById('scrollTop');
+            const header = document.getElementById('header');
+            const scrollProgress = document.getElementById('scrollProgress');
+            
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            
+            if (scrollProgress) scrollProgress.style.width = scrolled + "%";
+            if (header) header.classList.toggle('scrolled', winScroll > 50);
+            if (scrollTop) scrollTop.classList.toggle('visible', winScroll > 300);
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (fabContainer && !fabContainer.contains(e.target)) {
+                const menu = document.getElementById('fabMenu');
+                const btn = document.getElementById('fabMain');
+                if (menu) menu.classList.remove('active');
+                if (btn) btn.classList.remove('active');
+            }
+            
+            // Hutbe download
+            const downloadDropdown = document.querySelector('.download-dropdown');
+            if (downloadDropdown && !downloadDropdown.contains(e.target)) {
+                const menu = document.getElementById('downloadMenu');
+                const toggle = document.querySelector('.download-toggle');
+                if (menu) menu.classList.remove('active');
+                if (toggle) toggle.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // TABS & MOBILE MENU
+        // ============================================
+        
+        function switchTab(btn, tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const content = document.getElementById('tabContent');
+            content.style.opacity = '0';
+            setTimeout(() => {
+                content.style.opacity = '1';
+            }, 200);
+        }
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // ============================================
+        // EVENT LİSTENER
+        // ============================================
+
+        document.addEventListener('click', function(e) {
+            const switcher = document.getElementById('langSwitcher');
+            if (switcher && !switcher.contains(e.target)) {
+                DitibLang.closeMenu();
+            }
+        });
+
+        window.addEventListener('popstate', () => {
+            DitibLang.init();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePrayerModal();
+            }
+        });
+
+        // ============================================
+        // INIT
+        // ============================================
+        
+        DitibLoader.init();
+        initDitibTransitions();
+        resetInterval();
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                DitibLoader.hide();
+            }
+        });
+    </script>
+</body>
+</html>

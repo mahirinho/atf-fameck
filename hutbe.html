@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Haftanın Hutbesi - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        body {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        body.page-loaded {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.page-loading {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* DITIB LOADING ANIMATION - SITE GIRIS */
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .ditib-loader.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader { display: none !important; }
+            body { opacity: 1 !important; visibility: visible !important; }
+        }
+
+        @media (max-width: 768px) {
+            .loader-logo-wrapper { width: 140px; height: 140px; }
+            .loader-logo { width: 100px; height: 100px; }
+            .loader-text-main { font-size: 18px; letter-spacing: 4px; }
+            .loader-text-sub { font-size: 12px; letter-spacing: 2px; }
+        }
+
+        /* BASE STYLES */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before { transform: scale(1); }
+        .social-icon:hover { transform: translateY(-2px); }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover { background: rgba(255,255,255,0.15); }
+
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled { box-shadow: var(--shadow-md); }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover { transform: scale(1.02); }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text { display: flex; flex-direction: column; }
+        .logo-text span:first-child { font-size: 18px; font-weight: 800; color: var(--primary-blue); letter-spacing: -0.5px; }
+        .logo-text span:last-child { font-size: 11px; color: var(--text-light); font-weight: 500; }
+
+        /* Navigation */
+        .nav { display: flex; gap: 30px; align-items: center; }
+        .nav-item { position: relative; }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a { color: var(--primary-red); }
+        .nav-item:hover > a::after { width: 100%; }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before { transform: scaleY(1); }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* HERO SECTION */
+        .hutbe-hero {
+            position: relative;
+            height: 50vh;
+            min-height: 400px;
+            max-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hutbe-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .hutbe-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+            max-width: 900px;
+        }
+
+        .hutbe-hero-content h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: -2px;
+        }
+
+        .hutbe-hero-content p {
+            font-size: clamp(16px, 2vw, 20px);
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover { opacity: 0.7; }
+        .breadcrumb i { font-size: 12px; }
+
+        /* FILTER SECTION */
+        .filter-section {
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filter-container {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid rgba(26,35,126,0.1);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(26,35,126,0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 18px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid rgba(26,35,126,0.1);
+            background: var(--white);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-blue);
+            color: var(--white);
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* HUTBE LIST SECTION */
+        .hutbe-section {
+            padding: 40px 20px 100px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hutbe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .hutbe-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .hutbe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
+            border-radius: 24px 24px 0 0;
+        }
+
+        .hutbe-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .hutbe-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .hutbe-date i { font-size: 14px; }
+
+        .hutbe-title-tr {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .hutbe-title-fr {
+            font-size: 16px;
+            color: var(--text-light);
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            border-left: 3px solid var(--ditib-gold);
+            padding-left: 15px;
+        }
+
+        .hutbe-description {
+            font-size: 15px;
+            color: var(--text-light);
+            line-height: 1.7;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        /* DOWNLOAD BUTTON WITH HOVER MENU */
+        .download-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary-red), #b71c1c);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(196,30,58,0.3);
+        }
+
+        .download-btn i { font-size: 18px; }
+
+        /* HOVER MENU */
+        .download-menu {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            padding: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+            margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .download-wrapper:hover .download-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .download-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .download-option:hover {
+            background: rgba(26,35,126,0.05);
+            border-color: var(--primary-blue);
+            transform: translateX(5px);
+        }
+
+        .download-option.tr:hover { border-color: var(--primary-red); background: rgba(196,30,58,0.05); }
+        .download-option.fr:hover { border-color: var(--accent-blue); background: rgba(25,118,210,0.05); }
+
+        .lang-flag {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .lang-flag.tr { background: linear-gradient(135deg, #e30a17, #c41e3a); color: white; }
+        .lang-flag.fr { background: linear-gradient(135deg, #0055a4, #1976d2); color: white; }
+
+        .lang-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .lang-label { font-size: 13px; color: var(--text-light); font-weight: 500; }
+        .lang-name { font-size: 15px; color: var(--text-dark); font-weight: 700; }
+
+        .download-arrow {
+            margin-left: auto;
+            color: var(--text-light);
+            transition: transform 0.3s;
+        }
+
+        .download-option:hover .download-arrow {
+            transform: translateX(5px);
+            color: var(--primary-blue);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 70px;
+            height: 70px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .footer-logo-circle:hover { transform: scale(1.1); }
+
+        .footer-logo-circle img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i { color: var(--primary-red); font-size: 14px; }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong { color: var(--white); font-weight: 700; }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover { transform: scale(1.1); }
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* Scroll to Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active { display: flex; }
+            .mobile-menu-btn { display: block; }
+            
+            .hutbe-grid { grid-template-columns: 1fr; }
+            
+            .filter-container { flex-direction: column; align-items: stretch; }
+            .search-box { min-width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left { display: none; }
+            .top-bar-container { justify-content: center; }
+            
+            .hutbe-hero { height: 40vh; min-height: 300px; }
+            .hutbe-hero-content h1 { font-size: 32px; }
+            
+            .hutbe-card { padding: 25px; }
+            .hutbe-title-tr { font-size: 18px; }
+            .hutbe-title-fr { font-size: 14px; }
+        }
+
+        @media (max-width: 480px) {
+            .hutbe-grid { grid-template-columns: 1fr; }
+            .download-menu { padding: 10px; }
+            .download-option { padding: 10px 12px; }
+        }
+
+        /* No results message */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .no-results i {
+            font-size: 64px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-results h3 {
+            font-size: 24px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- DITIB LOADING ANIMATION - SITE GIRIS -->
+    <div class="ditib-loader active" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="../img/ATFLogo.png" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        <div class="loader-text-main">Yükleniyor</div>
+        <div class="loader-line"></div>
+        <div class="loader-text-sub">DITIB Fameck Sunar</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right"> 
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="hutbeler.html" style="color: var(--primary-red);">Haftanın Hutbesi</a>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hutbe-hero">
+        <div class="hutbe-hero-content">
+            <h1>Haftanın Hutbesi</h1>
+            <p>DİTİB Fameck olarak her hafta hazırladığımız hutbeleri Türkçe ve Fransızca olarak indirebilirsiniz</p>
+            <div class="breadcrumb">
+                <a href="../index.html">Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Haftanın Hutbesi</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FILTER SECTION -->
+    <section class="filter-section">
+        <div class="filter-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Hutbe ara...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Tümü</button>
+                <button class="filter-btn" data-filter="2026">2026</button>
+                <button class="filter-btn" data-filter="2025">2025</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- HUTBE LIST SECTION -->
+    <section class="hutbe-section">
+        <div class="hutbe-grid" id="hutbeGrid">
+            
+            <!-- Hutbe 1 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>6 Mart 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Ramazan Ayında Zekât, Paylaşmanın Bereketi</h3>
+                <div class="hutbe-title-fr">La Zakat pendant le mois de Ramadan, la bénédiction du partage</div>
+                <p class="hutbe-description">
+                    Ramazan ayında zekât ve sadakanın önemi, yardımlaşma ve paylaşmanın topluma kazandırdığı bereket anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/06mart2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/6mars2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 2 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>27 Şubat 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Camiden Yükselen Medeniyet</h3>
+                <div class="hutbe-title-fr">La civilisation qui s’élève de la mosquée</div>
+                <p class="hutbe-description">
+                    Camilerin sadece ibadet yeri değil, aynı zamanda ilim, ahlak ve medeniyetin merkezi olduğu anlatılmaktadır.İslam'ın adalet anlayışı, toplumsal hayatta hakkaniyetin önemi ve herkesin hakkını gözetme sorumluluğu.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/27subat2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/27fevrier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 3 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>20 Şubat 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Kalple ve Bedenle Oruç Tutmak</h3>
+                <div class="hutbe-title-fr">Jeûner avec le cœur et le corps</div>
+                <p class="hutbe-description">
+                    Oruç ibadetinin sadece aç kalmak değil, kalp, dil ve davranışlarla da yapılması gerektiği anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/20subat2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/20fevrier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 4 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>13 Şubat 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Ramazan’ı Hakkıyla Karşılamak</h3>
+                <div class="hutbe-title-fr">Accueillir le Ramadan comme il se doit</div>
+                <p class="hutbe-description">
+                    Ramazan ayını en güzel şekilde karşılamak için manevi hazırlık yapmanın ve ibadetleri artırmanın önemi anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/13subat2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/13fevrier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Hutbe 5 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>06 Şubat 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Doğruluk İyiliğe, İyilik de Cennete Götürür</h3>
+                <div class="hutbe-title-fr">La sincérité mène au bien, et le bien mène au paradis</div>
+                <p class="hutbe-description">
+                    Doğruluk ve dürüstlüğün insanı iyiliğe yönlendirdiği ve sonunda cennete ulaştırdığı anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/6subat2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/6fevrier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 6 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>30 Ocak 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Berat Gecesi, Mağfiret Olunma Gecesidir</h3>
+                <div class="hutbe-title-fr">La Nuit du Berat est la nuit du pardon</div>
+                <p class="hutbe-description">
+                    Berat Gecesi’nin affedilme ve bağışlanma fırsatı olduğu, bu gecede dua ve ibadetin öneminden bahsedilmektedir.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/30ocak2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/30janvier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 7  -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>23 Ocak 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">İsraf ve Çevre Ahlakı</h3>
+                <div class="hutbe-title-fr">Le gaspillage et l’éthique environnementale</div>
+                <p class="hutbe-description">
+                    İsrafın zararları ve çevreyi korumanın İslam’daki ahlaki sorumluluğu anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/23ocak2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/23janvier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 8 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>16 Ocak 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Eşler Arasında Sevgi ve Saygı</h3>
+                <div class="hutbe-title-fr">L’amour et le respect entre les époux</div>
+                <p class="hutbe-description">
+                    Evlilikte sevgi, saygı, anlayış ve merhametin aile huzuru için ne kadar önemli olduğu anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/16ocak2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/16janvier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 9 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>09 Ocak 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Mi’racın Emaneti: Kudüs ve Namaz</h3>
+                <div class="hutbe-title-fr">L’héritage du Miraj : Jérusalem et la prière</div>
+                <p class="hutbe-description">
+                    Miraç mucizesi ve bu olayın Müslümanlara bıraktığı emanet olan namaz ile Kudüs’ün önemi anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/9ocak2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/9janvier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 10 -->
+            <div class="hutbe-card" data-year="2026">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>02 Ocak 2026</span>
+                </div>
+                <h3 class="hutbe-title-tr">Güzel Ahlak ile Yaşamak</h3>
+                <div class="hutbe-title-fr">Vivre avec une bonne morale</div>
+                <p class="hutbe-description">
+                    İslam’da güzel ahlakın önemi ve günlük hayatta nasıl uygulanması gerektiği anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/02ocak2026.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/2janvier2026.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 11 -->
+            <div class="hutbe-card" data-year="2025">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>26 Aralık 2025</span>
+                </div>
+                <h3 class="hutbe-title-tr">Müslümanın Zaman Bilinci ve Hesap Günü Sorumluluğu</h3>
+                <div class="hutbe-title-fr">La conscience du temps chez le musulman et la responsabilité du Jour du Jugement</div>
+                <p class="hutbe-description">
+                    Müslümanın zamanı doğru kullanması ve ahirette verilecek hesap bilinciyle yaşaması gerektiği anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/26aralik2025.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/26decembre2025.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hutbe 12 -->
+            <div class="hutbe-card" data-year="2025">
+                <div class="hutbe-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>19 Aralık 2025</span>
+                </div>
+                <h3 class="hutbe-title-tr">Bereket Mevsimi, Üç Aylar</h3>
+                <div class="hutbe-title-fr">La saison des bénédictions : les trois mois sacrés</div>
+                <p class="hutbe-description">
+                    Üç ayların manevi bereketi ve bu mübarek zamanların ibadetle değerlendirilmesinin önemi anlatılmaktadır.
+                </p>
+                <div class="download-wrapper">
+                    <div class="download-menu">
+                        <a href="../hutbeler/turkce/19aralik2025.pdf" class="download-option tr" download>
+                            <div class="lang-flag tr">🇹🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">İndir</span>
+                                <span class="lang-name">Türkçe PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                        <a href="../hutbeler/fransizca/19decembre2025.pdf" class="download-option fr" download>
+                            <div class="lang-flag fr">🇫🇷</div>
+                            <div class="lang-info">
+                                <span class="lang-label">Télécharger</span>
+                                <span class="lang-name">Français PDF</span>
+                            </div>
+                            <i class="fas fa-download download-arrow"></i>
+                        </a>
+                    </div>
+                    <button class="download-btn">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        Hutbeyi İndir
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://instagram.com" target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33610380277" target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0143621616" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- LOADING SCRIPT -->
+    <script>
+        // Siteye girerken loading animasyonu
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('ditibLoader').classList.remove('active');
+                document.body.classList.add('page-loaded');
+            }, 2500); // 2.5 saniye göster
+        });
+
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            const header = document.getElementById('header');
+            if (winScroll > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) scrollTop.classList.add('visible');
+            else scrollTop.classList.remove('visible');
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        // Mobile menu
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Filter functionality - SADECE 2026 ve 2025
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const hutbeCards = document.querySelectorAll('.hutbe-card');
+        const searchInput = document.getElementById('searchInput');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.getAttribute('data-filter');
+                filterHutbeler(filter, searchInput.value);
+            });
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            filterHutbeler(activeFilter, e.target.value);
+        });
+
+        function filterHutbeler(yearFilter, searchTerm) {
+            let visibleCount = 0;
+            
+            hutbeCards.forEach(card => {
+                const year = card.getAttribute('data-year');
+                const titleTr = card.querySelector('.hutbe-title-tr').textContent.toLowerCase();
+                const titleFr = card.querySelector('.hutbe-title-fr').textContent.toLowerCase();
+                const desc = card.querySelector('.hutbe-description').textContent.toLowerCase();
+                
+                const matchesYear = yearFilter === 'all' || year === yearFilter;
+                const matchesSearch = !searchTerm || 
+                    titleTr.includes(searchTerm.toLowerCase()) || 
+                    titleFr.includes(searchTerm.toLowerCase()) || 
+                    desc.includes(searchTerm.toLowerCase());
+                
+                if (matchesYear && matchesSearch) {
+                    card.style.display = 'flex';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, visibleCount * 50);
+                    visibleCount++;
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+
+            // Show no results message
+            const existingNoResults = document.querySelector('.no-results');
+            if (existingNoResults) existingNoResults.remove();
+
+            if (visibleCount === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = `
+                    <i class="fas fa-search"></i>
+                    <h3>Sonuç Bulunamadı</h3>
+                    <p>Arama kriterlerinize uygun hutbe bulunamadı.</p>
+                `;
+                document.getElementById('hutbeGrid').appendChild(noResults);
+            }
+        }
+
+        // Initial animation
+        hutbeCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.5s ease';
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Yönetim - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --gold: #ffd700;
+            --light-gold: #ffed4e;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+            --shadow-glow: 0 0 30px rgba(26,35,126,0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text span:first-child {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* HERO SECTION - CAMİ İÇİ FOTOĞRAF */
+        .management-hero {
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            max-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .management-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .management-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+            max-width: 900px;
+        }
+
+        .management-hero-content h1 {
+            font-size: clamp(48px, 8vw, 80px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: -2px;
+        }
+
+        .management-hero-content p {
+            font-size: clamp(16px, 2vw, 22px);
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb i {
+            font-size: 12px;
+        }
+
+        /* MANAGEMENT SECTIONS */
+        .management-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 48px);
+            color: var(--text-dark);
+            font-weight: 900;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue), var(--gold));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: clamp(16px, 2vw, 20px);
+            max-width: 700px;
+            margin: 30px auto 0;
+            line-height: 1.8;
+        }
+
+        /* HIERARCHY LEVELS */
+        .hierarchy-level {
+            margin-bottom: 100px;
+            position: relative;
+        }
+
+        .hierarchy-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .hierarchy-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hierarchy-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .hierarchy-badge:hover::before {
+            left: 100%;
+        }
+
+        .hierarchy-badge i {
+            font-size: 22px;
+        }
+
+        /* CARDS GRID */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+            gap: 50px; 
+        }
+
+        .cards-grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+        }
+
+        .profile-card.president-card,
+        .profile-card.developer-card { 
+            max-width: 500px; 
+            transform: scale(1.05);
+        }
+
+        .profile-card.president-card .profile-image-container,
+        .profile-card.developer-card .profile-image-container {
+            height: 400px;
+        }
+
+        .profile-card.president-card .profile-name,
+        .profile-card.developer-card .profile-name {
+            font-size: 36px; 
+        }
+
+        .profile-card.president-card .profile-role,
+        .profile-card.developer-card .profile-role {
+            font-size: 14px; 
+            padding: 10px 25px; 
+        }
+
+        .profile-card.developer-card:hover {
+            transform: scale(1.08) translateY(-15px) rotateX(5deg);
+            box-shadow: 0 35px 70px rgba(220, 38, 38, 0.25), 0 0 50px rgba(220, 38, 38, 0.15);
+            z-index: 10;
+        }
+
+        /* Responsive düzenlemeler */
+        @media (max-width: 1200px) {
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .profile-card.developer-card {
+                transform: scale(1);
+                max-width: 100%;
+            }
+            .profile-card.developer-card .profile-image-container {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-card.developer-card .profile-image-container {
+                height: 300px;
+            }
+            .profile-card.developer-card .profile-name {
+                font-size: 28px;
+            }
+        }
+
+        /* PROFILE CARD */
+        .profile-card {
+            background: rgba(255,255,255,0.75);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.4);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue), var(--gold));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .profile-card:hover {
+            transform: translateY(-15px) rotateX(5deg) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 40px rgba(26,35,126,0.2);
+        }
+
+        .profile-image-container {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-bg));
+        }
+
+        .profile-image-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, rgba(255,255,255,0.75), transparent);
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s;
+        }
+
+        .profile-card:hover .profile-image {
+            transform: scale(1.1);
+        }
+
+        .profile-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26,35,126,0.8), rgba(196,30,58,0.6));
+            opacity: 0;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .profile-card:hover .profile-overlay {
+            opacity: 1;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 18px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-card:hover .social-btn {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .profile-card:hover .social-btn:nth-child(1) { transition-delay: 0.1s; }
+        .profile-card:hover .social-btn:nth-child(2) { transition-delay: 0.2s; }
+        .profile-card:hover .social-btn:nth-child(3) { transition-delay: 0.3s; }
+
+        .social-btn:hover {
+            background: var(--primary-red);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .profile-content {
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-role {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold), var(--light-gold));
+            color: var(--primary-blue);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+
+        .profile-name {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .profile-quote {
+            position: relative;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26,35,126,0.05), rgba(196,30,58,0.05));
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        .profile-quote::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            font-size: 60px;
+            color: var(--primary-red);
+            opacity: 0.2;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .profile-quote p {
+            font-style: italic;
+            color: var(--text-light);
+            font-size: 15px;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* CARDS FOR PRESIDENT */
+        .president-card {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .president-card .profile-image-container {
+            height: 350px;
+        }
+
+        .president-card .profile-name {
+            font-size: 32px;
+        }
+
+        /* YOUTH SECTION  */
+        .youth-section .hierarchy-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .youth-section .profile-card::before {
+            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+        }
+
+        /* WOMEN SECTION  */
+        .women-section .hierarchy-badge {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+        }
+
+        .women-section .profile-card::before {
+            background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+        }
+
+        /* MEMBERS SECTION  */
+        .members-section .hierarchy-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .members-section .profile-card::before {
+            background: linear-gradient(90deg, #f59e0b, #ef4444, #8b5cf6);
+        }
+
+        /* CONNECTING LINES BETWEEN SECTIONS */
+        .section-connector {
+            width: 4px;
+            height: 80px;
+            background: linear-gradient(to bottom, var(--primary-blue), var(--primary-red));
+            margin: 0 auto 50px;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .section-connector::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            box-shadow: 0 0 0 8px rgba(196,30,58,0.2);
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            background: linear-gradient(135deg, var(--dark-bg), #0a1929);
+            padding: 40px 20px;
+            margin: 60px auto;
+            max-width: 1400px; /* Daha geniş */
+            border-radius: 25px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 eşit sütun */
+            gap: 20px; /* Boşlukları biraz azalttık */
+            text-align: center;
+            color: var(--white);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Responsive düzenlemeler */
+        @media (max-width: 992px) {
+            .stats-bar {
+                grid-template-columns: repeat(3, 1fr); /* Tablet: 3+2 */
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr); /* Mobil: 2+2+1 */
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-bar {
+                grid-template-columns: 1fr; /* Küçük mobil: tek sütun */
+            }
+        }
+
+        .stats-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--primary-red), var(--accent-blue));
+        }
+
+        .stat-item-bar h4 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--gold), var(--white));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-item-bar p {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 70px;
+            height: 70px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-logo-circle img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* Scroll to Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .management-hero {
+                height: 60vh;
+                min-height: 400px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 30px;
+            }
+            
+            .president-card {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            
+            .management-hero-content h1 {
+                font-size: 40px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stat-item-bar h4 {
+                font-size: 36px;
+            }
+            
+            .profile-name {
+                font-size: 22px;
+            }
+            
+            .president-card .profile-name {
+                font-size: 26px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .management-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+            
+            .management-hero-content h1 {
+                font-size: 32px;
+            }
+            
+            .hierarchy-badge {
+                font-size: 16px;
+                padding: 12px 25px;
+            }
+            
+            .profile-image-container {
+                height: 240px;
+            }
+            
+            .president-card .profile-image-container {
+                height: 300px;
+            }
+            
+            .profile-content {
+                padding: 20px;
+            }
+        }
+        /* TEKNİK EKİP */
+        .tech-section .hierarchy-badge {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+        }
+
+        .tech-section .hierarchy-badge i {
+            color: #fecaca;
+        }
+
+        .tech-section .profile-card::before {
+            background: linear-gradient(90deg, #dc2626, #ef4444, #f87171);
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        .tech-section .profile-card:hover {
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2), 0 0 40px rgba(220, 38, 38, 0.2);
+        }
+
+        .tech-section .profile-role {
+            background: linear-gradient(135deg, #fecaca, #fca5a5);
+            color: #991b1b;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+        }
+
+        .tech-section .profile-quote {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.05), rgba(239, 68, 68, 0.05));
+        }
+
+        .tech-section .profile-quote::before {
+            color: #dc2626;
+        }
+
+        .tech-section .social-btn:hover {
+            background: #dc2626;
+            color: var(--white);
+        }
+
+        .tech-section .profile-overlay {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.8), rgba(185, 28, 28, 0.6));
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i>ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibstrasbourg.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibstrasbourg.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i>06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="yonetim.html">Yönetim</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="management-hero">
+        <div class="management-hero-content">
+            <h1>Yönetim</h1>
+            <p>Geleceğe emin adımlarla yürüyen, tecrübeli ve dinamik kadromuzla hizmetinizdeyiz</p>
+            <div class="breadcrumb">
+                <a href="../index.html">Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Yönetim</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item-bar">
+            <h4>12</h4>
+            <p>Yönetim Kurulu</p>
+        </div>
+        <div class="stat-item-bar">
+            <h4>4</h4>
+            <p>Teknik Ekip</p>
+        </div>
+        <div class="stat-item-bar">
+            <h4>8</h4>
+            <p>Gençlik Kolları</p>
+        </div>
+        <div class="stat-item-bar">
+            <h4>6</h4>
+            <p>Kadın Kolları</p>
+        </div>
+        <div class="stat-item-bar">
+            <h4>450+</h4>
+            <p>Aktif Üye</p>
+        </div>
+
+    </div>
+
+    <!-- YÖNETİM KADROSU -->
+    <section class="management-section">
+        <div class="hierarchy-level">
+            <div class="hierarchy-header">
+                <div class="hierarchy-badge">
+                    <i class="fas fa-crown"></i>
+                    Yönetim Kurulu
+                </div>
+            </div>
+            
+            <div class="cards-grid">
+                <!-- BAŞKAN -->
+                <div class="profile-card president-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/Fazil Hakan.png" alt="Başkan" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="social-btn"><i class="fas fa-phone"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Dernek Başkanı</span>
+                        <h3 class="profile-name">Fazil Hakan</h3>
+                        <div class="profile-quote">
+                            <p>"Birlikte daha güçlüyüz. Gelecek nesillere daha güzel bir dünya bırakmak için çalışıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hocamiz -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Başkan Yardımcısı" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Hocamız</span>
+                        <h3 class="profile-name">Ramazan Işık</h3>
+                        <div class="profile-quote">
+                            <p>"Dayanışma ve kardeşlik ruhuyla, toplumumuzun her kesimine ulaşmayı hedefliyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GENEL SEKRETER -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Genel Sekreter" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Genel Sekreter</span>
+                        <h3 class="profile-name">Şeref Balcı</h3>
+                        <div class="profile-quote">
+                            <p>"Düzen ve disiplinle, her projemizi en iyi şekilde hayata geçiriyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOCAMIZ -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Sayman" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Muhasebeci</span>
+                        <h3 class="profile-name">Serkan Ulaş</h3>
+                        <div class="profile-quote">
+                            <p>"Şeffaf ve hesap verebilir bir yönetim anlayışıyla hareket ediyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÜYE 1 -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Yönetim Kurulu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Yönetim Kurulu Üyesi</span>
+                        <h3 class="profile-name">........</h3>
+                        <div class="profile-quote">
+                            <p>"Eğitim ve kültür projeleriyle gençlerimizin geleceğine yatırım yapıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÜYE 2 -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Yönetim Kurulu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Yönetim Kurulu Üyesi</span>
+                        <h3 class="profile-name">......</h3>
+                        <div class="profile-quote">
+                            <p>"Sosyal yardımlaşma ve dayanışma ile toplumumuzun sırtını sıvazlıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÜYE 3 -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Yönetim Kurulu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Yönetim Kurulu Üyesi</span>
+                        <h3 class="profile-name">.....</h3>
+                        <div class="profile-quote">
+                            <p>"Kadınlarımızın toplumsal hayatta daha aktif rol alması için çalışıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ÜYE 4 -->
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Yönetim Kurulu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Yönetim Kurulu Üyesi</span>
+                        <h3 class="profile-name">....</h3>
+                        <div class="profile-quote">
+                            <p>"Gençlik kollarımızla geleceğin liderlerini yetiştiriyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-connector"></div>
+
+        <!-- TEKNİK EKİP / DİJİTAL EKİP -->
+        <div class="hierarchy-level tech-section">
+            <div class="hierarchy-header">
+                <div class="hierarchy-badge">
+                    <i class="fas fa-laptop-code"></i>
+                    Teknik Ekip & Dijital İletişim
+                </div>
+            </div>
+            
+            <div class="cards-grid">
+                <div class="profile-card developer-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/Kaan-Mahir-Hakan.JPG" alt="Web Geliştirici" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="mailto:kaanmahir.hakan@yahoo.com" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="https://www.linkedin.com/in/kaan-mahir-hakan/" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="https://github.com" target="_blank" class="social-btn"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Yazılım Geliştirici</span>
+                        <h3 class="profile-name">Kaan Mahir Hakan</h3>
+                        <div class="profile-quote">
+                            <p>"Camimizin dijital yüzünü oluşturmak ve modern web teknolojileriyle hizmet sunmak için çalışıyorum."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Sosyal Medya Yöneticisi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Sosyal Medya Yöneticisi</span>
+                        <h3 class="profile-name">İsim Soyisim</h3>
+                        <div class="profile-quote">
+                            <p>"Sosyal medya platformlarında camimizi en iyi şekilde temsil ediyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Grafik Tasarımcı" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-behance"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Grafik Tasarımcı</span>
+                        <h3 class="profile-name">İsim Soyisim</h3>
+                        <div class="profile-quote">
+                            <p>"Görsel iletişimde estetik ve profesyonelliği bir araya getiriyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="İçerik Yöneticisi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">İçerik Yöneticisi</span>
+                        <h3 class="profile-name">İsim Soyisim</h3>
+                        <div class="profile-quote">
+                            <p>"Dijital platformlarda içerik stratejileri oluşturuyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-connector"></div>
+        
+        <!-- GENÇLİK KOLLARI -->
+        <div class="hierarchy-level youth-section">
+            <div class="hierarchy-header">
+                <div class="hierarchy-badge">
+                    <i class="fas fa-rocket"></i>
+                    Gençlik Kolları
+                </div>
+            </div>
+            
+            <div class="cards-grid cards-grid-4">
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Gençlik Kolu Başkanı" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Gençlik Kolu Başkanı</span>
+                        <h3 class="profile-name">Recep Doğan</h3>
+                        <div class="profile-quote">
+                            <p>"Gençlik enerjimizle değişimi başlatıyor, geleceği şekillendiriyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Gençlik Kolu Başkan Yardımcısı" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                            <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Başkan Yardımcısı</span>
+                        <h3 class="profile-name">....</h3>
+                        <div class="profile-quote">
+                            <p>"Yaratıcı fikirlerimizle toplumumuza değer katıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Gençlik Kolu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Gençlik Kolu Üyesi</span>
+                        <h3 class="profile-name">....</h3>
+                        <div class="profile-quote">
+                            <p>"Sportif ve kültürel aktivitelerle gençlerimizi bir araya getiriyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Gençlik Kolu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Gençlik Kolu Üyesi</span>
+                        <h3 class="profile-name">....</h3>
+                        <div class="profile-quote">
+                            <p>"Eğitim seminerlerimizle gençlerimizi bilinçlendiriyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-connector"></div>
+
+        <!-- KADIN KOLLARI -->
+        <div class="hierarchy-level women-section">
+            <div class="hierarchy-header">
+                <div class="hierarchy-badge">
+                    <i class="fas fa-heart"></i>
+                    Kadın Kolları
+                </div>
+            </div>
+            
+            <div class="cards-grid cards-grid-4">
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Kadınlar Kolu Başkanı" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Kadınlar Kolu Başkanı</span>
+                        <h3 class="profile-name">.....</h3>
+                        <div class="profile-quote">
+                            <p>"Kadınlarımızın güçlenmesi için var gücümüzle çalışıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Kadınlar Kolu Başkan Yardımcısı" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Başkan Yardımcısı</span>
+                        <h3 class="profile-name">.....</h3>
+                        <div class="profile-quote">
+                            <p>"Aile içi eğitimlerimizle sağlıklı toplumun temelini atıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Kadınlar Kolu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Kadınlar Kolu Üyesi</span>
+                        <h3 class="profile-name">....</h3>
+                        <div class="profile-quote">
+                            <p>"El sanatları ve meslek edindirme kurslarıyla kadınlarımıza destek oluyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Kadınlar Kolu Üyesi" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Kadınlar Kolu Üyesi</span>
+                        <h3 class="profile-name">......</h3>
+                        <div class="profile-quote">
+                            <p>"Sosyal yardımlaşma faaliyetlerimizle ihtiyaç sahiplerine ulaşıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-connector"></div>
+
+        <!-- ÜYELER -->
+        <div class="hierarchy-level members-section">
+            <div class="hierarchy-header">
+                <div class="hierarchy-badge">
+                    <i class="fas fa-users"></i>
+                    Aktif Üyelerimiz
+                </div>
+            </div>
+            
+            <div class="cards-grid cards-grid-4">
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">......</h3>
+                        <div class="profile-quote">
+                            <p>"Camimizin her köşesinde hizmet etmekten gurur duyuyorum."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">.......</h3>
+                        <div class="profile-quote">
+                            <p>"Cemaatimizin hizmetkârı olmak en büyük mutluluğum."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">......</h3>
+                        <div class="profile-quote">
+                            <p>"Gönüllülük esasıyla yapılan her işte bereket var."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">.....</h3>
+                        <div class="profile-quote">
+                            <p>"Birlik ve beraberlik içinde nice yıllara."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">.......</h3>
+                        <div class="profile-quote">
+                            <p>"DİTİB ailesinin bir parçası olmak gurur verici."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">......</h3>
+                        <div class="profile-quote">
+                            <p>"Hizmet etmek için her zaman hazırım."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">......</h3>
+                        <div class="profile-quote">
+                            <p>"Gençlik kollarımızla geleceğe umutla bakıyoruz."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card fade-in">
+                    <div class="profile-image-container">
+                        <img src="../img/cami-ici.jpg" alt="Üye" class="profile-image">
+                        <div class="profile-overlay">
+                            <a href="#" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="profile-content">
+                        <span class="profile-role">Aktif Üye</span>
+                        <h3 class="profile-name">.....</h3>
+                        <div class="profile-quote">
+                            <p>"Camimizin kapısı herkese açık, gönüller bir."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/search/top?q=atf%20ditib%20fameck" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33656674269" target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0656674269" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            // Header scroll effect
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            // Scroll to top button
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            const menuHeight = menu.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const btnRect = btn.getBoundingClientRect();
+            const availableSpace = btnRect.top;
+            
+            if (menuHeight > availableSpace - 20) {
+                menu.style.maxHeight = (availableSpace - 100) + 'px';
+                menu.style.overflowY = 'auto';
+            }
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        // Close FAB when clicking outside
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all profile cards
+        document.querySelectorAll('.profile-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 3D Tilt Effect for Cards
+        document.querySelectorAll('.profile-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-15px) scale(1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+
+        // Stats counter animation
+        function animateStats() {
+            const stats = document.querySelectorAll('.stat-item-bar h4');
+            stats.forEach(stat => {
+                const target = parseInt(stat.textContent);
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        stat.textContent = target + (stat.textContent.includes('+') ? '+' : '');
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(current) + (stat.textContent.includes('+') ? '+' : '');
+                    }
+                }, 30);
+            });
+        }
+
+        // Trigger stats animation when visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateStats();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const statsBar = document.querySelector('.stats-bar');
+        if (statsBar) {
+            statsObserver.observe(statsBar);
+        }
+    </script>
+</body>
+</html>

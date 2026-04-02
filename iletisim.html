@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>İletişim - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css ">
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+            --shadow-glow: 0 0 40px rgba(26,35,126,0.3);
+        }
+
+ 
+        body {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        body.page-loaded {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.page-loading {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .ditib-loader.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 
+                0 20px 60px rgba(26, 35, 126, 0.15),
+                0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+   
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader { display: none !important; }
+            body { opacity: 1 !important; visibility: visible !important; }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .loader-logo-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+            .loader-logo {
+                width: 100px;
+                height: 100px;
+            }
+            .loader-text-main {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .loader-text-sub {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+        }
+
+ 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text span:first-child {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* CONTACT HERO SECTION */
+        .contact-hero {
+            position: relative;
+            height: 60vh;
+            min-height: 450px;
+            max-height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .contact-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+            max-width: 900px;
+        }
+
+        .contact-hero-content h1 {
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: -2px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .contact-hero-content p {
+            font-size: clamp(16px, 2vw, 22px);
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .breadcrumb a {
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb i {
+            font-size: 12px;
+        }
+
+        /* CONTACT INFO CARDS SECTION */
+        .contact-cards-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--text-dark);
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: clamp(16px, 2vw, 18px);
+            max-width: 600px;
+            margin: 30px auto 0;
+            line-height: 1.8;
+        }
+
+        .contact-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .contact-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .contact-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .contact-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .contact-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            background: rgba(255,255,255,0.95);
+        }
+
+        .contact-card-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--white);
+            position: relative;
+            transition: all 0.4s;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .contact-card-icon::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.3;
+            z-index: -1;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        .contact-card.phone .contact-card-icon { background: linear-gradient(135deg, #10b981, #059669); }
+        .contact-card.email .contact-card-icon { background: linear-gradient(135deg, var(--primary-red), #dc2626); }
+        .contact-card.address .contact-card-icon { background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue)); }
+        .contact-card.emergency .contact-card-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .contact-card.instagram .contact-card-icon { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .contact-card.facebook .contact-card-icon { background: linear-gradient(135deg, #1877f2, #0d5cb6); }
+
+        .contact-card:hover .contact-card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .contact-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .contact-card p {
+            font-size: 16px;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .contact-card-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(26,35,126,0.3);
+        }
+
+        .contact-card:hover .contact-card-action {
+            background: linear-gradient(135deg, var(--primary-red), #dc2626);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(196,30,58,0.4);
+        }
+
+        /* MAP SECTION */
+        .map-section {
+            padding: 0 20px 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .map-container {
+            background: rgba(255,255,255,0.8);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .map-header {
+            padding: 30px 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .map-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .map-header h2 i {
+            font-size: 28px;
+        }
+
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .map-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .map-iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+            display: block;
+        }
+
+        /* WORKING HOURS SECTION */
+        .hours-section {
+            padding: 80px 20px;
+            background-image: url(../img/arka.png);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .hours-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.4);
+            pointer-events: none;
+        }
+
+        .hours-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hours-card {
+            background: rgba(255,255,255,0.85);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .hours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .hours-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 25px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .hours-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.9);
+            box-shadow: var(--shadow-md);
+        }
+
+        .hours-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .hours-content h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .hours-content p {
+            font-size: 15px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .hours-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 6px 14px;
+            background: #10b981;
+            color: var(--white);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .hours-status.closed {
+            background: #ef4444;
+        }
+
+        /* EMERGENCY SECTION */
+        .emergency-section {
+            padding: 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .emergency-card {
+            background: linear-gradient(135deg, var(--primary-red), #b91c1c);
+            border-radius: 30px;
+            padding: 50px;
+            color: var(--white);
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .emergency-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 25px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            animation: emergencyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+            50% { box-shadow: 0 0 0 30px rgba(255,255,255,0); }
+        }
+
+        .emergency-card h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .emergency-card p {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .emergency-phone {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--white);
+            color: var(--primary-red);
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 28px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .emergency-phone:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .emergency-phone i {
+            font-size: 32px;
+            animation: phoneShake 1s ease-in-out infinite;
+        }
+
+        @keyframes phoneShake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        /* SOCIAL CONNECT SECTION */
+        .social-connect-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .social-connect-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-connect-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            transition: height 0.4s ease;
+            z-index: 0;
+        }
+
+        .social-connect-card.instagram::before { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .social-connect-card.facebook::before { background: linear-gradient(135deg, #1877f2, #0d5cb6); }
+        .social-connect-card.youtube::before { background: linear-gradient(135deg, #ff0000, #cc0000); }
+
+        .social-connect-card:hover::before {
+            height: 100%;
+        }
+
+        .social-connect-card:hover {
+            transform: translateY(-10px);
+            color: var(--white);
+        }
+
+        .social-connect-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .social-connect-card i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+            transition: transform 0.3s;
+        }
+
+        .social-connect-card:hover i {
+            transform: scale(1.2);
+        }
+
+        .social-connect-card h4 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .social-connect-card p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* Scroll to Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .contact-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+            
+            .hours-card {
+                padding: 30px;
+            }
+            
+            .emergency-card {
+                padding: 30px;
+            }
+            
+            .emergency-phone {
+                font-size: 22px;
+                padding: 15px 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            
+            .contact-hero-content h1 {
+                font-size: 36px;
+            }
+            
+            .contact-cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hours-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-regional {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .footer-contact {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-hero {
+                height: 45vh;
+                min-height: 300px;
+            }
+            
+            .contact-card {
+                padding: 30px 20px;
+            }
+            
+            .hours-card {
+                padding: 25px 20px;
+            }
+            
+            .emergency-card h2 {
+                font-size: 24px;
+            }
+            
+            .emergency-phone {
+                font-size: 20px;
+                padding: 12px 24px;
+            }
+            
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- DITIB LOADING OVERLAY -->
+    <div class="ditib-loader" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="../img/ATFLogo.jpg" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        
+        <div class="loader-text-main">Yükleniyor</div>
+        <div class="loader-line"></div>
+        <div class="loader-text-sub">DITIB Fameck Sunar</div>
+        
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right"> 
+                <a href="https://www.facebook.com/ATFFameck " target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/ " target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com " target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari ">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTACT HERO SECTION -->
+    <section class="contact-hero">
+        <div class="contact-hero-content">
+            <h1>İletişim</h1>
+            <p>Bizimle iletişime geçmek için aşağıdaki kanalları kullanabilirsiniz. Size en kısa sürede dönüş yapacağız.</p>
+            <div class="breadcrumb">
+                <a href="../index.html">Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>İletişim</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT CARDS SECTION -->
+    <section class="contact-cards-section">
+        <div class="section-header">
+            <h2 class="section-title">Bize Ulaşın</h2>
+            <p class="section-subtitle">Size yardımcı olmak için buradayız. Tercih ettiğiniz kanaldan bize ulaşabilirsiniz.</p>
+        </div>
+
+        <div class="contact-cards-grid">
+            <!-- Telefon -->
+            <a href="tel:0656674269" class="contact-card phone">
+                <div class="contact-card-icon">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3>Telefon</h3>
+                <p>Cami ve dernek hakkında bilgi almak için bizi arayın.</p>
+                <div class="contact-card-action">
+                    <i class="fas fa-phone"></i> 06 56 67 42 69
+                </div>
+            </a>
+
+            <!-- Email -->
+            <a href="mailto:ditib.fameck@gmail.com" class="contact-card email">
+                <div class="contact-card-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>E-Posta</h3>
+                <p>Sorularınızı ve önerilerinizi e-posta ile gönderebilirsiniz.</p>
+                <div class="contact-card-action">
+                    <i class="fas fa-paper-plane"></i> E-Posta Gönder
+                </div>
+            </a>
+
+            <!-- Adres -->
+            <a href="https://maps.google.com/?q=69+A+Rue+de+la+Centrale+57290+Fameck " target="_blank" class="contact-card address">
+                <div class="contact-card-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3>Adres</h3>
+                <p>69 A Rue de la Centrale, 57290 Fameck, Fransa</p>
+                <div class="contact-card-action">
+                    <i class="fas fa-location-arrow"></i> Yol Tarifi Al
+                </div>
+            </a>
+
+            <!-- Acil Cenaze Fonu -->
+            <a href="tel:0661728623" class="contact-card emergency">
+                <div class="contact-card-icon">
+                    <i class="fas fa-ambulance"></i>
+                </div>
+                <h3>Acil Cenaze Fonu</h3>
+                <p>7/24 acil cenaze nakil hizmetleri için bu hattı arayın.</p>
+                <div class="contact-card-action">
+                    <i class="fas fa-exclamation-circle"></i> 06 61 72 86 23
+                </div>
+            </a>
+
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/atf_fameck/ " target="_blank" class="contact-card instagram">
+                <div class="contact-card-icon">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <h3>Instagram</h3>
+                <p>Etkinliklerimizi ve güncel haberleri takip edin.</p>
+                <div class="contact-card-action">
+                    <i class="fab fa-instagram"></i> @atf_fameck
+                </div>
+            </a>
+
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/atf_genclik_fameck/ " target="_blank" class="contact-card instagram">
+                <div class="contact-card-icon">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <h3>Instagram</h3>
+                <p>Gençlik Kollarımızı takip edin.</p>
+                <div class="contact-card-action">
+                    <i class="fab fa-instagram"></i> @atf_genclik_fameck
+                </div>
+            </a>
+
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/atf.kgk/ " target="_blank" class="contact-card instagram">
+                <div class="contact-card-icon">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <h3>Instagram</h3>
+                <p>Kız Gençlik Kollarımızı takip edin.</p>
+                <div class="contact-card-action">
+                    <i class="fab fa-instagram"></i> @atf.kgk
+                </div>
+            </a>
+
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/ATFFameck " target="_blank" class="contact-card facebook">
+                <div class="contact-card-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <h3>Facebook</h3>
+                <p>Topluluk sayfamıza katılın ve etkinlikleri kaçırmayın.</p>
+                <div class="contact-card-action">
+                    <i class="fab fa-facebook-f"></i> ATF Fameck
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- MAP SECTION -->
+    <section class="map-section">
+        <div class="map-container">
+            <div class="map-header">
+                <h2><i class="fas fa-mosque"></i> DITIB Fameck Konumu</h2>
+                <a href="https://maps.google.com/?q=69+A+Rue+de+la+Centrale+57290+Fameck " target="_blank" class="map-btn">
+                    <i class="fas fa-external-link-alt"></i> Google Maps'te Aç
+                </a>
+            </div>
+            <iframe 
+                class="map-iframe"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2601.070318034797!2d6.108165312512522!3d49.31295196849033!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47952588540980c5%3A0x8becd9bebd03e1eb!2sMosqu%C3%A9e%20(Amicale%20Turque%20Et%20Fran%C3%A7aise%20-%20DITIB%20Fameck)!5e0!3m2!1sen!2sfr!4v1772398476266!5m2!1sen!2sfr" 
+                width="100%"
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </section>
+
+    <!-- WORKING HOURS SECTION -->
+    <section class="hours-section">
+        <div class="hours-container">
+            <div class="section-header">
+                <h2 class="section-title">Çalışma Saatlerimiz</h2>
+                <p class="section-subtitle">Size en iyi hizmeti sunmak için belirli saatlerde hizmetinizdeyiz.</p>
+            </div>
+
+            <div class="hours-card">
+                <div class="hours-grid">
+                    <div class="hours-item">
+                        <div class="hours-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="hours-content">
+                            <h4>Hafta İçi</h4>
+                            <p>09:30 - 12:30<br>13:30 - 17:30</p>
+                            <span class="hours-status">
+                                <i class="fas fa-check-circle"></i> Açık
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="hours-item">
+                        <div class="hours-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="hours-content">
+                            <h4>Cuma Namazı</h4>
+                            <p>Öğle namazı vaktinde<br>ve sonrası</p>
+                            <span class="hours-status">
+                                <i class="fas fa-check-circle"></i> Açık
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="hours-item">
+                        <div class="hours-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="hours-content">
+                            <h4>Hafta Sonu</h4>
+                            <p>Cumartesi: 10:00 - 16:00<br>Pazar: Kapalı</p>
+                            <span class="hours-status closed">
+                                <i class="fas fa-times-circle"></i> Sınırlı
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="hours-item">
+                        <div class="hours-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="hours-content">
+                            <h4>Acil Durumlar</h4>
+                            <p>Cenaze fonu ve acil<br>durumlar için 7/24</p>
+                            <span class="hours-status">
+                                <i class="fas fa-check-circle"></i> 7/24 Açık
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EMERGENCY SECTION -->
+    <section class="emergency-section">
+        <div class="emergency-card">
+            <div class="emergency-icon">
+                <i class="fas fa-ambulance"></i>
+            </div>
+            <h2>Acil Cenaze Fonu Hattı</h2>
+            <p>7 gün 24 saat hizmetinizdeyiz. Acil cenaze nakil ve defin işlemleri için hemen arayın.</p>
+            <a href="tel:0610380277" class="emergency-phone">
+                <i class="fas fa-phone-alt"></i> 06 10 38 02 77
+            </a>
+        </div>
+    </section>
+
+    <!-- SOCIAL CONNECT SECTION -->
+    <section class="social-connect-section">
+        <div class="section-header">
+            <h2 class="section-title">Sosyal Medyada Bizi Takip Edin</h2>
+            <p class="section-subtitle">Etkinliklerimizden, duyurularımızdan ve güncel haberlerden haberdar olun.</p>
+        </div>
+
+        <div class="social-grid">
+            <a href="https://www.instagram.com/atf_fameck/ " target="_blank" class="social-connect-card instagram">
+                <i class="fab fa-instagram"></i>
+                <h4>Instagram</h4>
+                <p>@atf_fameck</p>
+            </a>
+
+            <a href="https://www.facebook.com/ATFFameck " target="_blank" class="social-connect-card facebook">
+                <i class="fab fa-facebook-f"></i>
+                <h4>Facebook</h4>
+                <p>ATF Fameck</p>
+            </a>
+
+            <a href="https://youtube.com " target="_blank" class="social-connect-card youtube">
+                <i class="fab fa-youtube"></i>
+                <h4>YouTube</h4>
+                <p>DITIB Fameck</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck   " target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/ " target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com " target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr   ">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr   ">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr   ">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr   ">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://www.instagram.com/atf_fameck/ " target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com " target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33656674269 " target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0143621616" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Scroll to Top -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- LOADING SYSTEM JAVASCRIPT  -->
+    <script>
+        const DitibLoader = {
+            container: document.getElementById('ditibLoader'),
+            isTransitioning: false,
+            minDisplayTime: 2000,
+            
+            init: function() {
+                this.show();
+                document.body.classList.add('page-loading');
+                
+                if (document.readyState === 'complete') {
+                    this.onPageReady();
+                } else {
+                    window.addEventListener('load', () => this.onPageReady());
+                }
+                
+                this.initLinkListeners();
+            },
+            
+            show: function() {
+                this.container.classList.add('active');
+            },
+            
+            hide: function() {
+                this.container.classList.remove('active');
+            },
+            
+            onPageReady: function() {
+                setTimeout(() => {
+                    this.hide();
+                    document.body.classList.remove('page-loading');
+                    document.body.classList.add('page-loaded');
+                    this.isTransitioning = false;
+                }, this.minDisplayTime);
+            },
+            
+            initLinkListeners: function() {
+                const links = document.querySelectorAll('a[href]');
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    
+                    if (!href || href === '#' || href.startsWith('javascript:')) return;
+                    if (href.startsWith('http') && !href.includes(window.location.hostname)) return;
+                    if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                    if (href.startsWith('#')) return;
+                    
+                    link.addEventListener('click', (e) => {
+                        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                        e.preventDefault();
+                        this.navigate(href);
+                    });
+                });
+            },
+            
+            navigate: function(url) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+                
+                this.show();
+                document.body.classList.remove('page-loaded');
+                document.body.classList.add('page-loading');
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 400);
+            }
+        };
+
+        DitibLoader.init();
+
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                DitibLoader.hide();
+                document.body.classList.remove('page-loading');
+                document.body.classList.add('page-loaded');
+            }
+        });
+    </script>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            // Header scroll effect
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            // Scroll to top button
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            const menuHeight = menu.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const btnRect = btn.getBoundingClientRect();
+            const availableSpace = btnRect.top;
+            
+            if (menuHeight > availableSpace - 20) {
+                menu.style.maxHeight = (availableSpace - 100) + 'px';
+                menu.style.overflowY = 'auto';
+            }
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        // Close FAB when clicking outside
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe contact cards with stagger
+        document.querySelectorAll('.contact-card').forEach((el, index) => {
+            el.style.transitionDelay = (index * 0.1) + 's';
+            observer.observe(el);
+        });
+
+        // Observe other elements
+        document.querySelectorAll('.hours-item, .social-connect-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+
+        // Check working hours status
+        function checkWorkingHours() {
+            const now = new Date();
+            const day = now.getDay();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const currentTime = hour * 60 + minute;
+            
+            // Weekday
+            const isWeekday = day >= 1 && day <= 5;
+            const isMorningOpen = currentTime >= 570 && currentTime < 750;
+            const isAfternoonOpen = currentTime >= 810 && currentTime < 1050;
+            
+            const statusElements = document.querySelectorAll('.hours-status');
+            statusElements.forEach(el => {
+                if (el.textContent.includes('Açık') && !el.textContent.includes('7/24')) {
+                    if (isWeekday && (isMorningOpen || isAfternoonOpen)) {
+                        el.style.background = '#10b981';
+                        el.innerHTML = '<i class="fas fa-check-circle"></i> Şu An Açık';
+                    } else {
+                        el.style.background = '#ef4444';
+                        el.innerHTML = '<i class="fas fa-times-circle"></i> Şu An Kapalı';
+                    }
+                }
+            });
+        }
+
+        checkWorkingHours();
+        setInterval(checkWorkingHours, 60000); 
+    </script>
+</body>
+</html>

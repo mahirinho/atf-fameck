@@ -1,0 +1,2702 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Bölge DİTİB Birimleri - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --loading-bg: #ffffff;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, rgba(26,35,126,0.9) 0%, rgba(196,30,58,0.85) 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* ============================================
+           PROFESYONEL DITIB LOADING TRANSITION SYSTEM
+           ============================================ */
+        
+        .ditib-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 999999;
+            background: var(--loading-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .ditib-loader.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loader-logo-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 
+                0 20px 60px rgba(26, 35, 126, 0.15),
+                0 10px 30px rgba(196, 30, 58, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(26, 35, 126, 0.15), 0 10px 30px rgba(196, 30, 58, 0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(26, 35, 126, 0.2), 0 15px 40px rgba(196, 30, 58, 0.15); }
+        }
+
+        .loader-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(90deg, var(--ditib-blue) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: blueShadow 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes blueShadow {
+            0%, 100% { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(270deg, var(--ditib-red) 0%, transparent 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0;
+            animation: redShadow 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+            z-index: -1;
+        }
+
+        @keyframes redShadow {
+            0%, 100% { opacity: 0; transform: translateX(20px) scale(0.8); }
+            50% { opacity: 0.6; transform: translateX(0) scale(1); }
+        }
+
+        .loader-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-ring {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid transparent;
+            border-top-color: var(--ditib-blue);
+            border-right-color: var(--ditib-red);
+            border-radius: 50%;
+            animation: ringRotate 2s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-ring-bg {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 3px solid rgba(0,0,0,0.05);
+            border-radius: 50%;
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .loader-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ditib-gold);
+            animation: dotBounce 1.4s ease-in-out infinite both;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .loader-text-main {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--ditib-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.3s;
+        }
+
+        @keyframes textFadeIn {
+            to { opacity: 1; }
+        }
+
+        .loader-text-sub {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ditib-red);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            opacity: 0;
+            animation: textFadeIn 0.8s ease forwards 0.6s;
+        }
+
+        .loader-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            margin: 20px 0;
+            border-radius: 1px;
+            opacity: 0;
+            animation: lineExpand 1s ease forwards 0.9s;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
+        }
+
+        .loader-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--ditib-blue), var(--ditib-red));
+            animation: progressFill 2s ease-out forwards;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* İnternet Bağlantısı Yok Ekranı */
+        .offline-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000000;
+            background: var(--loading-bg);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .offline-screen.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--ditib-blue), var(--ditib-red));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            margin-bottom: 30px;
+            animation: offlinePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes offlinePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 40px rgba(26, 35, 126, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 50px rgba(196, 30, 58, 0.4); }
+        }
+
+        .offline-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ditib-blue);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .offline-message {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .offline-brand {
+            font-size: 14px;
+            color: var(--ditib-red);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(196,30,58,0.4);
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(196,30,58,0.5);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ditib-loader, .offline-screen { transition: none !important; }
+        }
+
+        @media (max-width: 768px) {
+            .loader-logo-wrapper { width: 140px; height: 140px; }
+            .loader-logo { width: 100px; height: 100px; }
+            .loader-text-main { font-size: 18px; letter-spacing: 4px; }
+            .loader-text-sub { font-size: 12px; letter-spacing: 2px; }
+            .offline-title { font-size: 22px; }
+            .offline-message { font-size: 14px; padding: 0 20px; }
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url('../img/arka.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Beyaz overlay kaldırıldı - sadece hafif karartma */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.15); /* Hafif karartma */
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-blue));
+            z-index: 10000;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 10px 0;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 55px;
+            height: 55px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text span:first-child {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            padding-left: 25px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* Hero Section  */
+        .units-hero {
+            position: relative;
+            height: 60vh;
+            min-height: 450px;
+            max-height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; 
+        }
+
+        .units-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5); 
+        }
+
+        .units-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            padding: 0 20px;
+            max-width: 900px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .units-hero-content h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: -1px;
+        }
+
+        .units-hero-content p {
+            font-size: clamp(16px, 2vw, 20px);
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: var(--white);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.7;
+        }
+
+        .breadcrumb i {
+            font-size: 12px;
+        }
+
+        /* Map Section */
+        .map-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--text-dark);
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-blue));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            font-size: clamp(16px, 2vw, 18px);
+            max-width: 600px;
+            margin: 30px auto 0;
+            line-height: 1.8;
+        }
+
+        .map-container {
+            background: rgba(255,255,255,0.9);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red), var(--accent-blue));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        #map {
+            height: 500px;
+            border-radius: 20px;
+            z-index: 1;
+        }
+
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .legend-dot.main { background: var(--primary-red); }
+        .legend-dot.regional { background: var(--primary-blue); }
+        .legend-dot.fameck { background: #FFD700; }
+
+        /* Units Grid Section */
+        .units-section {
+            padding: 80px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        /* Fameck karti icin neon kirmizi efekt */
+        .unit-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .unit-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .unit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .unit-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Fameck karti icin ozel neon kirmizi efekt */
+        .unit-card.fameck-card {
+            border: 3px solid transparent;
+            box-shadow: 0 0 20px rgba(196, 30, 58, 0.3), var(--shadow-xl);
+            animation: neonPulse 2s infinite;
+            order: -1; /* Basa koymak icin */
+        }
+
+        .unit-card.fameck-card::before {
+            background: linear-gradient(90deg, #ff0000, #ff6b6b, #ff0000);
+            height: 5px;
+            transform: scaleX(1);
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(196, 30, 58, 0.4), 0 0 40px rgba(196, 30, 58, 0.2), var(--shadow-xl);
+                border-color: rgba(196, 30, 58, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(196, 30, 58, 0.6), 0 0 60px rgba(196, 30, 58, 0.3), var(--shadow-xl);
+                border-color: rgba(196, 30, 58, 0.6);
+            }
+        }
+
+        .unit-card.fameck-card:hover {
+            box-shadow: 0 0 40px rgba(196, 30, 58, 0.5), 0 0 80px rgba(196, 30, 58, 0.3), var(--shadow-xl);
+        }
+
+        .unit-header {
+            padding: 30px;
+            background-image: url('../img/cami-ici.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Varsayılan gradient - fotoğraf yoksa görünecek */
+        .unit-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+            z-index: 0;
+        }
+
+        /* Tekli kartlar için mavi (varsayılan) */
+        .unit-card:nth-child(odd) .unit-header::after {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-blue) 100%);
+        }
+
+        /* Çiftli kartlar için kırmızı (varsayılan) */
+        .unit-card:nth-child(even) .unit-header::after {
+            background: linear-gradient(135deg, var(--primary-red) 0%, #b71c1c 100%);
+        }
+
+        /* Fameck karti icin ozel header */
+        .unit-card.fameck-card .unit-header::after {
+            background: linear-gradient(135deg, #ff0000 0%, #c41e3a 50%, #ff0000 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Fotoğraf eklemek için kullanılacak class */
+        .unit-header.has-image::after {
+            opacity: 0.85; /* Fotoğrafı hafif karartmak için */
+        }
+
+        .unit-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        /* Logo yerine gorsel arka plan - kare format */
+        .unit-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.5);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Logo container - logo icin gorsel arka plan */
+        .unit-icon.logo-icon {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: rgba(255,255,255,0.95);
+        }
+
+        /* Fameck icin ozel logo stilleri */
+        .unit-card.fameck-card .unit-icon {
+            border: 3px solid rgba(255,215,0,0.8);
+            box-shadow: 0 0 20px rgba(255,215,0,0.4), 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .unit-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+        }
+
+        .unit-region {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+        }
+
+        .unit-body {
+            padding: 25px 30px;
+        }
+
+        .unit-info {
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .info-item i {
+            color: var(--primary-blue);
+            font-size: 16px;
+            margin-top: 3px;
+            width: 20px;
+        }
+
+        .unit-card:nth-child(even) .info-item i {
+            color: var(--primary-red);
+        }
+
+        .unit-card.fameck-card .info-item i {
+            color: #ff0000;
+        }
+
+        .info-item span {
+            line-height: 1.5;
+        }
+
+        .unit-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            display: block;
+        }
+
+        .unit-card:nth-child(even) .stat-number {
+            color: var(--primary-red);
+        }
+
+        .unit-card.fameck-card .stat-number {
+            color: #ff0000;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .unit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-unit {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary-unit {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: var(--white);
+        }
+
+        .btn-primary-unit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26,35,126,0.3);
+        }
+
+        .unit-card.fameck-card .btn-primary-unit {
+            background: linear-gradient(135deg, #ff0000, #c41e3a);
+        }
+
+        .btn-outline-unit {
+            background: transparent;
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .unit-card:nth-child(even) .btn-outline-unit {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .unit-card.fameck-card .btn-outline-unit {
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+
+        .btn-outline-unit:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .unit-card:nth-child(even) .btn-outline-unit:hover {
+            background: var(--primary-red);
+        }
+
+        .unit-card.fameck-card .btn-outline-unit:hover {
+            background: #ff0000;
+            color: white;
+        }
+
+        /* Interactive Features Section - Sadece koyu mavi */
+        .features-section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            transition: height 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--white);
+            margin: 0 auto 25px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(26,35,126,0.3);
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--white);
+            color: var(--primary-blue);
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .feature-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            position: relative;
+            z-index: 1;
+            transition: color 0.4s;
+        }
+
+        .feature-card:hover .feature-title {
+            color: var(--white);
+        }
+
+        .feature-text {
+            font-size: 15px;
+            color: var(--text-light);
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+            transition: color 0.4s;
+        }
+
+        .feature-card:hover .feature-text {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Contact CTA Section - Sadece koyu mavi */
+        .cta-section {
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0d1642 100%);
+            border-radius: 30px;
+            padding: 60px 40px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .cta-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-title {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-text {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* FAB */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+        }
+
+        .fab-main {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--accent-blue);
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .fab-main::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            opacity: 0.2;
+            transform: scale(1);
+            animation: ripple 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .fab-main.active {
+            transform: rotate(45deg);
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fab-menu.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .fab-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fab-menu.active .fab-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fab-menu.active .fab-item:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.active .fab-item:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.active .fab-item:nth-child(3) { transition-delay: 0.3s; }
+        .fab-menu.active .fab-item:nth-child(4) { transition-delay: 0.4s; }
+
+        .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .fab-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fab-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .fab-youtube { background: #ff0000; }
+        .fab-whatsapp { background: #25d366; }
+        .fab-phone { background: var(--primary-blue); }
+
+        .fab-label {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        /* Scroll Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            font-size: 18px;
+            border: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-red);
+            transform: translateY(-5px);
+        }
+
+        /* Custom Leaflet Popup Styles */
+        .leaflet-popup-content-wrapper {
+            border-radius: 15px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .leaflet-popup-content {
+            margin: 0;
+            width: 280px !important;
+        }
+
+        .map-popup {
+            text-align: center;
+        }
+
+        .map-popup-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            padding: 15px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .map-popup-body {
+            padding: 15px;
+        }
+
+        .map-popup-address {
+            font-size: 13px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .map-popup-phone {
+            font-size: 14px;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .units-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #map {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+            
+            .map-container {
+                padding: 15px;
+            }
+            
+            #map {
+                height: 350px;
+            }
+            
+            .unit-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .unit-actions {
+                flex-direction: column;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .units-hero {
+                height: 50vh;
+                min-height: 350px;
+            }
+            
+            .map-legend {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PROFESYONEL DITIB LOADING OVERLAY -->
+    <div class="ditib-loader" id="ditibLoader">
+        <div class="loader-logo-wrapper">
+            <div class="loader-ring-bg"></div>
+            <div class="loader-ring"></div>
+            <img src="../img/ATFLogo.jpg" alt="DITIB Fameck" class="loader-logo">
+        </div>
+        
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+        
+        <div class="loader-text-main">Yükleniyor</div>
+        <div class="loader-line"></div>
+        <div class="loader-text-sub">DITIB Fameck Sunar</div>
+        
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- İNTERNET BAĞLANTISI YOK EKRANI -->
+    <div class="offline-screen" id="offlineScreen">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        <h2 class="offline-title">İnternet Bağlantısı Yok</h2>
+        <p class="offline-message">Lütfen internet durumunuzu kontrol edin</p>
+        <button class="retry-btn" onclick="window.location.reload()">
+            <i class="fas fa-redo"></i> Tekrar Dene
+        </button>
+        <div class="offline-brand">Saygılarımızla DITIB Fameck</div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://twitter.com" target="_blank" class="social-icon" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <div class="language-selector">
+                    <span>🇹🇷 Türkçe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span>DITIB Fameck</span>
+                    <span>Diyanet İşleri Türk İslam Birliği</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html">Ana Sayfa</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari">Cenaze Fonu</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html">Online Ödeme</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html">İletişim</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section - Cami içi fotoğrafı arka plan -->
+    <section class="units-hero">
+        <div class="units-hero-content">
+            <h1>Bölge DİTİB Birimleri</h1>
+            <p>Fransa'nın dört bir yanında hizmet veren 5 bölgesel birimimiz ile sizlere daha yakınız</p>
+            <div class="breadcrumb">
+                <a href="../index.html">Ana Sayfa</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Bölge Birimleri</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section">
+        <div class="section-header">
+            <h2 class="section-title">Birimlerimizin Konumu</h2>
+            <p class="section-subtitle">Fransa genelindeki bölgesel birimlerimizi harita üzerinde inceleyebilirsiniz</p>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-legend">
+                <div class="legend-item">
+                    <div class="legend-dot main"></div>
+                    <span>Ana Birim (Paris)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot regional"></div>
+                    <span>Bölgesel Birimler</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot fameck"></div>
+                    <span>Fameck (Biz)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Units Grid Section -->
+    <section class="units-section">
+        <div class="section-header">
+            <h2 class="section-title">Bölgesel Birimlerimiz</h2>
+            <p class="section-subtitle">Her bölge için detaylı iletişim bilgileri ve hizmet alanları</p>
+        </div>
+
+        <div class="units-grid">
+            <!-- Fameck -->
+            <div class="unit-card fameck-card">
+                <div class="unit-header">
+                    <div class="unit-icon logo-icon" style="background-image: url('../img/ATFLogo.jpg');">
+                    </div>
+                    <h3 class="unit-title">DİTİB Fameck</h3>
+                    <span class="unit-region">Grand Est Bölgesi (Biz)</span>
+                </div>
+                <div class="unit-body">
+                    <div class="unit-info">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>06 56 67 42 69</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>ditib.fameck@gmail.com</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.atf-fameck.fr</span>
+                        </div>
+                    </div>
+                    <div class="unit-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">15+</span>
+                            <span class="stat-label">Dernek</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Personel</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">4</span>
+                            <span class="stat-label">Yıllık Etkinlik</span>
+                        </div>
+                    </div>
+                    <div class="unit-actions">
+                        <a href="../index.html" class="btn-unit btn-primary-unit">
+                            <i class="fas fa-home"></i> Ana Sayfa
+                        </a>
+                        <a href="iletisim.html" class="btn-unit btn-outline-unit">
+                            <i class="fas fa-envelope"></i> İletişim
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paris -->
+            <div class="unit-card">
+                <div class="unit-header">
+                    <div class="unit-icon logo-icon" style="background-image: url('../img/ParisLogo.svg');">
+                    </div>
+                    <h3 class="unit-title">DİTİB Paris</h3>
+                    <span class="unit-region">Île-de-France Bölgesi</span>
+                </div>
+                <div class="unit-body">
+                    <div class="unit-info">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>58 Rue Lénine, 93170 Bagnolet</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+33 1 43 62 16 16</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@ditibparis.fr</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.ditibparis.fr</span>
+                        </div>
+                    </div>
+                    <div class="unit-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">85+</span>
+                            <span class="stat-label">Dernek</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">45</span>
+                            <span class="stat-label">Personel</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Yıllık Etkinlik</span>
+                        </div>
+                    </div>
+                    <div class="unit-actions">
+                        <a href="https://ditibparis.fr" target="_blank" class="btn-unit btn-primary-unit">
+                            <i class="fas fa-external-link-alt"></i> Web Sitesi
+                        </a>
+                        <a href="mailto:info@ditibparis.fr" class="btn-unit btn-outline-unit">
+                            <i class="fas fa-envelope"></i> İletişim
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strasbourg -->
+            <div class="unit-card">
+                <div class="unit-header">
+                    <div class="unit-icon logo-icon" style="background-image: url('../img/StrasbourgLogo.svg');">
+                    </div>
+                    <h3 class="unit-title">DİTİB Strasbourg</h3>
+                    <span class="unit-region">Grand Est Bölgesi</span>
+                </div>
+                <div class="unit-body">
+                    <div class="unit-info">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>3 Rue Thomas Mann, 67200 Strasbourg</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+33 3 88 330 430</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@ditibstrasbourg.fr</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.ditibstrasbourg.fr</span>
+                        </div>
+                    </div>
+                    <div class="unit-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">45+</span>
+                            <span class="stat-label">Dernek</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">28</span>
+                            <span class="stat-label">Personel</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">8</span>
+                            <span class="stat-label">Yıllık Etkinlik</span>
+                        </div>
+                    </div>
+                    <div class="unit-actions">
+                        <a href="https://ditibstrasbourg.fr" target="_blank" class="btn-unit btn-primary-unit">
+                            <i class="fas fa-external-link-alt"></i> Web Sitesi
+                        </a>
+                        <a href="mailto:info@ditibstrasbourg.fr" class="btn-unit btn-outline-unit">
+                            <i class="fas fa-envelope"></i> İletişim
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lyon -->
+            <div class="unit-card">
+                <div class="unit-header">
+                    <div class="unit-icon logo-icon" style="background-image: url('../img/LyonLogo.svg');">
+                    </div>
+                    <h3 class="unit-title">DİTİB Lyon</h3>
+                    <span class="unit-region">Auvergne-Rhône-Alpes Bölgesi</span>
+                </div>
+                <div class="unit-body">
+                    <div class="unit-info">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>72 Rue Paul et Marc Barbezat, 69150 Décines-Charpieu</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+33 4 78 94 67 57</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@ditiblyon.fr</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.ditiblyon.fr</span>
+                        </div>
+                    </div>
+                    <div class="unit-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">55+</span>
+                            <span class="stat-label">Dernek</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">32</span>
+                            <span class="stat-label">Personel</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">10</span>
+                            <span class="stat-label">Yıllık Etkinlik</span>
+                        </div>
+                    </div>
+                    <div class="unit-actions">
+                        <a href="https://ditiblyon.fr" target="_blank" class="btn-unit btn-primary-unit">
+                            <i class="fas fa-external-link-alt"></i> Web Sitesi
+                        </a>
+                        <a href="mailto:info@ditiblyon.fr" class="btn-unit btn-outline-unit">
+                            <i class="fas fa-envelope"></i> İletişim
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bordeaux -->
+            <div class="unit-card">
+                <div class="unit-header">
+                    <div class="unit-icon logo-icon" style="background-image: url('../img/DitibLogoBuyuk.png');">
+                    </div>
+                    <h3 class="unit-title">DİTİB Bordeaux</h3>
+                    <span class="unit-region">Nouvelle-Aquitaine Bölgesi</span>
+                </div>
+                <div class="unit-body">
+                    <div class="unit-info">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>145 Rue Izzet Koç, 33310 Lormont</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+33 5 56 48 15 90</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@ditibbordeaux.fr</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.ditibbordeaux.fr</span>
+                        </div>
+                    </div>
+                    <div class="unit-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">35+</span>
+                            <span class="stat-label">Dernek</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">22</span>
+                            <span class="stat-label">Personel</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">6</span>
+                            <span class="stat-label">Yıllık Etkinlik</span>
+                        </div>
+                    </div>
+                    <div class="unit-actions">
+                        <a href="https://ditibfrance.fr" target="_blank" class="btn-unit btn-primary-unit">
+                            <i class="fas fa-external-link-alt"></i> Web Sitesi
+                        </a>
+                        <a href="mailto:info@ditibbordeaux.fr" class="btn-unit btn-outline-unit">
+                            <i class="fas fa-envelope"></i> İletişim
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nantes -->
+            <div class="unit-card">
+                <div class="unit-header">
+                    <div class="unit-icon logo-icon" style="background-image: url('../img/DitibLogoBuyuk.png');">
+                    </div>
+                    <h3 class="unit-title">DİTİB Nantes</h3>
+                    <span class="unit-region">Pays de la Loire Bölgesi</span>
+                </div>
+                <div class="unit-body">
+                    <div class="unit-info">
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>58 Rue Lénine, 93170 Bagnolet (Merkez)</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+33 1 43 62 16 16</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@ditib.fr</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.ditibfrance.fr</span>
+                        </div>
+                    </div>
+                    <div class="unit-stats">
+                        <div class="stat-box">
+                            <span class="stat-number">25+</span>
+                            <span class="stat-label">Dernek</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">18</span>
+                            <span class="stat-label">Personel</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">5</span>
+                            <span class="stat-label">Yıllık Etkinlik</span>
+                        </div>
+                    </div>
+                    <div class="unit-actions">
+                        <a href="https://ditibfrance.fr" target="_blank" class="btn-unit btn-primary-unit">
+                            <i class="fas fa-external-link-alt"></i> Web Sitesi
+                        </a>
+                        <a href="mailto:info@ditib.fr" class="btn-unit btn-outline-unit">
+                            <i class="fas fa-envelope"></i> İletişim
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2 class="section-title">Birimlerimizin Hizmetleri</h2>
+            <p class="section-subtitle">Tüm bölgesel birimlerimizde standart olarak sunulan hizmetler</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-praying-hands"></i>
+                </div>
+                <h3 class="feature-title">Dini Hizmetler</h3>
+                <p class="feature-text">Cuma namazı, bayram namazları, nikah törenleri ve dini danışmanlık hizmetleri</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="feature-title">Eğitim Faaliyetleri</h3>
+                <p class="feature-text">Kur'an kursları, Arapça eğitimleri, ilahiyat programları ve seminerler</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3 class="feature-title">Sosyal Yardımlaşma</h3>
+                <p class="feature-text">Cenaze fonu, yardımlaşma sandığı ve sosyal destek programları</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Gençlik ve Kadın</h3>
+                <p class="feature-text">Gençlik kampları, kadın kolları faaliyetleri ve aile danışmanlığı</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3 class="feature-title">Kütüphane ve Araştırma</h3>
+                <p class="feature-text">İslami kaynaklar, akademik çalışmalar, tarihi eserler ve dijital arşiv hizmetleri</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h3 class="feature-title">Spor ve Kültür</h3>
+                <p class="feature-text">Spor turnuvaları, kültürel etkinlikler, geleneksel sanatlar ve müzik programları</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section - Sadece koyu mavi -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2 class="cta-title">Size En Yakın Birimi Bulun</h2>
+            <p class="cta-text">Fransa'nın her yerinde hizmetinizdeyiz. Size en yakın DİTİB birimine ulaşmak için iletişime geçin.</p>
+            <a href="iletisim.html" class="cta-btn">
+                <i class="fas fa-map-marked-alt"></i> İletişim Bilgileri
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Designed and Developed by</span>
+            <strong>Kaan Mahir Hakan</strong>
+        </div>
+    </footer>
+
+    <!-- FAB -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="fab-item" aria-label="Instagram">
+                <div class="fab-icon fab-instagram"><i class="fab fa-instagram"></i></div>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="fab-item" aria-label="YouTube">
+                <div class="fab-icon fab-youtube"><i class="fab fa-youtube"></i></div>
+            </a>
+            <a href="https://wa.me/33656674269" target="_blank" class="fab-item" aria-label="WhatsApp">
+                <div class="fab-icon fab-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            </a>
+            <a href="tel:0143621616" class="fab-item" aria-label="Bizi Arayın">
+                <div class="fab-icon fab-phone"><i class="fas fa-phone"></i></div>
+                <span class="fab-label">Bizi Arayın</span>
+            </a>
+        </div>
+        <button class="fab-main" id="fabMain" onclick="toggleFab()" aria-label="Menüyü Aç/Kapat">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Scroll Top -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()" role="button" aria-label="Yukarı Çık">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // PROFESYONEL DITIB LOADING SYSTEM
+        const DitibLoader = {
+            container: document.getElementById('ditibLoader'),
+            offlineScreen: document.getElementById('offlineScreen'),
+            isTransitioning: false,
+            minDisplayTime: 1500,
+            startTime: 0,
+            
+            init: function() {
+                this.show();
+                this.startTime = Date.now();
+                
+                this.checkConnection();
+                
+                if (document.readyState === 'complete') {
+                    this.onPageReady();
+                } else {
+                    window.addEventListener('load', () => this.onPageReady());
+                }
+                
+                window.addEventListener('online', () => this.handleOnline());
+                window.addEventListener('offline', () => this.handleOffline());
+            },
+            
+            checkConnection: function() {
+                if (!navigator.onLine) {
+                    this.handleOffline();
+                }
+            },
+            
+            handleOffline: function() {
+                this.hide();
+                this.offlineScreen.classList.add('visible');
+            },
+            
+            handleOnline: function() {
+                this.offlineScreen.classList.remove('visible');
+                window.location.reload();
+            },
+            
+            show: function() {
+                this.container.classList.add('visible');
+            },
+            
+            hide: function() {
+                this.container.classList.remove('visible');
+            },
+            
+            onPageReady: function() {
+                const elapsed = Date.now() - this.startTime;
+                const remaining = Math.max(0, this.minDisplayTime - elapsed);
+                
+                setTimeout(() => {
+                    this.hide();
+                }, remaining);
+            },
+            
+            navigate: function(url) {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+                
+                this.show();
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 400);
+            }
+        };
+
+        // Sayfa geçişlerini yakala
+        function initDitibTransitions() {
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
+                if (href.startsWith('http') && !href.includes(window.location.hostname)) return;
+                if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                if (href.startsWith('#')) return;
+                
+                link.addEventListener('click', function(e) {
+                    if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+                    e.preventDefault();
+                    DitibLoader.navigate(href);
+                });
+            });
+        }
+
+        DitibLoader.init();
+        initDitibTransitions();
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                DitibLoader.hide();
+            }
+        });
+
+        // Initialize Map
+        function initMap() {
+            const map = L.map('map').setView([46.603354, 1.888334], 5);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const locations = [
+                { name: "DİTİB Paris", coords: [48.8566, 2.3522], address: "58 Rue Lénine, 93170 Bagnolet", phone: "+33 1 43 62 16 16", type: "main" },
+                { name: "DİTİB Strasbourg", coords: [48.5734, 7.7521], address: "3 Rue Thomas Mann, 67200 Strasbourg", phone: "+33 3 88 330 430", type: "regional" },
+                { name: "DİTİB Lyon", coords: [45.7640, 4.8357], address: "72 Rue Paul et Marc Barbezat, 69150 Décines-Charpieu", phone: "+33 4 78 94 67 57", type: "regional" },
+                { name: "DİTİB Bordeaux", coords: [44.8378, -0.5792], address: "145 Rue Izzet Koç, 33310 Lormont", phone: "+33 5 56 48 15 90", type: "regional" },
+                { name: "DİTİB Nantes", coords: [47.2184, -1.5536], address: "58 Rue Lénine, 93170 Bagnolet", phone: "+33 1 43 62 16 16", type: "regional" },
+                { name: "DİTİB Fameck (Biz)", coords: [49.2986, 6.1094], address: "69 A Rue de la Centrale, 57290 Fameck", phone: "03 82 84 07 95", type: "fameck" }
+            ];
+
+            const redIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background: #c41e3a; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.3);"></div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const blueIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background: #1a237e; width: 25px; height: 25px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.3);"></div>',
+                iconSize: [25, 25],
+                iconAnchor: [12, 12]
+            });
+
+            const fameckIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background: #FFD700; width: 35px; height: 35px; border-radius: 50%; border: 4px solid white; box-shadow: 0 0 20px rgba(255,215,0,0.8), 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #c41e3a; font-weight: bold;">📍</div>',
+                iconSize: [35, 35],
+                iconAnchor: [17, 17]
+            });
+
+            locations.forEach(loc => {
+                let icon;
+                if (loc.type === 'main') icon = redIcon;
+                else if (loc.type === 'fameck') icon = fameckIcon;
+                else icon = blueIcon;
+                
+                const marker = L.marker(loc.coords, { icon: icon }).addTo(map);
+                
+                marker.bindPopup(`
+                    <div class="map-popup">
+                        <div class="map-popup-header" style="${loc.type === 'fameck' ? 'background: linear-gradient(135deg, #FFD700, #FFA500); color: #c41e3a;' : ''}">${loc.name}</div>
+                        <div class="map-popup-body">
+                            <div class="map-popup-address">${loc.address}</div>
+                            <div class="map-popup-phone"><i class="fas fa-phone"></i> ${loc.phone}</div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Scroll Progress
+        window.addEventListener('scroll', () => {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            const header = document.getElementById('header');
+            if (winScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            const scrollTop = document.getElementById('scrollTop');
+            if (winScroll > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAB Toggle
+        function toggleFab() {
+            const menu = document.getElementById('fabMenu');
+            const btn = document.getElementById('fabMain');
+            
+            menu.classList.toggle('active');
+            btn.classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const fabContainer = document.querySelector('.fab-container');
+            if (!fabContainer.contains(e.target)) {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+            }
+        });
+
+        // Mobile Menu
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.unit-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Initialize map when page loads
+        window.addEventListener('load', initMap);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('fabMenu').classList.remove('active');
+                document.getElementById('fabMain').classList.remove('active');
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

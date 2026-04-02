@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Yapım Aşamasında - DITIB Fameck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --ditib-blue: #1a237e;
+            --ditib-red: #c41e3a;
+            --ditib-gold: #d4af37;
+            --primary-red: #c41e3a;
+            --primary-blue: #1a237e;
+            --accent-blue: #1976d2;
+            --dark-bg: #001f3f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        /* ============================================
+           DİL SEÇİCİ STYLLERİ
+           ============================================ */
+        
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+            z-index: 99999;
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .lang-btn i {
+            font-size: 11px;
+            transition: transform 0.3s;
+        }
+
+        .lang-btn.active i {
+            transform: rotate(180deg);
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+            z-index: 999999;
+        }
+
+        .lang-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .lang-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+            background: var(--white);
+        }
+
+        .lang-item:last-child {
+            border-bottom: none;
+        }
+
+        .lang-item:hover {
+            background: #f8f9fa;
+            padding-left: 20px;
+        }
+
+        .lang-item.active {
+            background: linear-gradient(135deg, rgba(26,35,126,0.08), rgba(196,30,58,0.08));
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .lang-flag {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .lang-name {
+            font-size: 14px;
+            flex: 1;
+            color: #1a1a1a; 
+            font-weight: 500;
+        }
+
+        .lang-code {
+            font-size: 11px;
+            color: var(--text-light);
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-image: url('../img/arka.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .top-bar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d1642 100%);
+            color: var(--white);
+            padding: 6px 0;
+            font-size: 12px;
+            position: relative;
+            overflow: visible;
+            z-index: 9999;
+        }
+
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .top-bar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 8px;
+            overflow: visible;
+        }
+
+        .top-bar-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-bar-left a {
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            opacity: 0.9;
+            font-size: 11px;
+        }
+
+        .top-bar-left a:hover {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .top-bar-left a i {
+            font-size: 11px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            position: relative;
+            z-index: 99999;
+        }
+
+        .social-icon {
+            color: var(--white);
+            text-decoration: none;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-size: 12px;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-red);
+            transform: scale(0);
+            transition: transform 0.3s;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .social-icon:hover::before {
+            transform: scale(1);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            background-image: url(../img/ATFLogo.jpg);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .logo-text .logo-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        .nav {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item > a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item > a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item:hover > a {
+            color: var(--primary-red);
+        }
+
+        .nav-item:hover > a::after {
+            width: 100%;
+        }
+
+        /* ============================================
+        DROPDOWN MENÜ - DİKEY VERSİYON
+        ============================================ */
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.25s ease;
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 1000;
+            display: block;
+            margin-top: 8px;
+            padding: 4px 0;
+            flex-direction: column !important;
+        }
+
+        .nav-item:nth-child(2) .dropdown {
+            left: 0;
+            right: auto;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: block !important;
+            width: 100%;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 14px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s ease;
+            position: relative;
+            background: var(--white);
+            line-height: 1.4;
+            box-sizing: border-box;
+            float: none;
+            clear: both;
+        }
+
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-red);
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown a:hover {
+            background-color: #fafafa;
+            color: var(--primary-red);
+            padding-left: 24px;
+        }
+
+        .dropdown a:hover::before {
+            transform: scaleY(1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--primary-blue);
+            padding: 8px;
+        }
+
+        /* ============================================
+           YAPIM AŞAMASINDA İÇERİK - KOYU MAVİ BEYAZ
+           ============================================ */
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            min-height: calc(100vh - 300px);
+        }
+
+        .construction-container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .construction-icon-wrapper {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .construction-icon {
+            width: 100%;
+            height: 100%;
+            background: var(--ditib-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            color: var(--white);
+            box-shadow: 0 20px 60px rgba(26, 35, 126, 0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .construction-icon i {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .construction-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 4px dashed var(--ditib-gold);
+            border-radius: 50%;
+            animation: rotate 15s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .construction-title {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 800;
+            color: var(--ditib-blue);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .construction-title span {
+            color: var(--ditib-blue);
+            font-weight: 900;
+        }
+
+        .construction-divider {
+            width: 100px;
+            height: 4px;
+            background: var(--ditib-blue);
+            margin: 0 auto 30px;
+            border-radius: 2px;
+        }
+
+        .construction-message {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .construction-features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ditib-blue);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .feature-item i {
+            color: var(--ditib-blue);
+            font-size: 18px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--ditib-blue);
+            color: var(--white);
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.4);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(26, 35, 126, 0.5);
+            background: #0d1642;
+        }
+
+        .back-btn i {
+            transition: transform 0.3s;
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* ============================================
+           FOOTER - GELİŞTİRİLMİŞ VERSİYON
+           ============================================ */
+        
+        .footer {
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #000 100%);
+            color: var(--white);
+            padding: 50px 0 0;
+            position: relative;
+            overflow: hidden;
+            margin-top: auto;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-social-top {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social-top a {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-radius: 10px;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-social-top a:hover {
+            background: var(--primary-red);
+            transform: translateY(-3px);
+        }
+
+        .footer-regional {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-regional a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .footer-regional a:hover {
+            color: var(--white);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .footer-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            max-width: 300px;
+            min-width: 80px;
+        }
+
+        .footer-logos {
+            display: flex;
+            gap: 25px;
+            padding: 0 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-logo-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            padding: 5px;
+        }
+
+        .footer-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 100%;
+        }
+
+        .footer-logo-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .logo-separator {
+            width: 40px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .footer-contact {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .footer-contact-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-contact-item i {
+            color: var(--primary-red);
+            font-size: 14px;
+        }
+
+        /* ============================================
+           FOOTER BOTTOM - GELİŞTİRİLMİŞ VERSİYON
+           ============================================ */
+        
+        .footer-bottom {
+            background: rgba(0,0,0,0.5);
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .footer-bottom::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ditib-gold), transparent);
+        }
+
+        .footer-bottom-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .footer-developer {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--white);
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ffffff, var(--ditib-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        .footer-developer i {
+            color: var(--ditib-gold);
+            font-size: 24px;
+            -webkit-text-fill-color: var(--ditib-gold);
+        }
+
+        @media (max-width: 768px) {
+            .footer-bottom {
+                padding: 25px 15px;
+            }
+            
+            .footer-bottom-text {
+                font-size: 12px;
+            }
+            
+            .footer-developer {
+                font-size: 22px;
+                letter-spacing: 1px;
+            }
+            
+            .footer-developer i {
+                font-size: 20px;
+            }
+            
+            .construction-icon-wrapper {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .construction-icon {
+                font-size: 60px;
+            }
+            
+            .construction-features {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .main-content {
+                padding: 40px 20px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav { 
+                display: none; 
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-lg);
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .nav.active {
+                display: flex;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar-left {
+                display: none;
+            }
+            .top-bar-container {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .construction-icon-wrapper {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .construction-icon {
+                font-size: 50px;
+            }
+            
+            .construction-title {
+                font-size: 24px;
+            }
+            
+            .construction-message {
+                font-size: 16px;
+            }
+            
+            .back-btn {
+                padding: 14px 30px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR WITH LANGUAGE SWITCHER -->
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <a href="mailto:ditib.fameck@gmail.com"><i class="fas fa-envelope"></i> ditib.fameck@gmail.com</a>
+                <a href="mailto:cenazefonu@ditibparis.fr"><i class="fas fa-envelope"></i> cenazefonu@ditibparis.fr</a>
+                <a href="tel:0656674269"><i class="fas fa-phone"></i> 06 56 67 42 69</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" class="social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                
+                <!-- DİL SEÇİCİ DROPDOWN -->
+                <div class="lang-switcher" id="langSwitcher">
+                    <button class="lang-btn" onclick="toggleLangMenu(event)" aria-label="Dil Seçimi">
+                        <span id="currentFlag">🇹🇷</span>
+                        <span id="currentLangName">Türkçe</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="lang-dropdown" id="langDropdown">
+                        <div class="lang-item active" onclick="changeLanguage('tr')" data-lang="tr">
+                            <span class="lang-flag">🇹🇷</span>
+                            <span class="lang-name">Türkçe</span>
+                            <span class="lang-code">TR</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('fr')" data-lang="fr">
+                            <span class="lang-flag">🇫🇷</span>
+                            <span class="lang-name">Français</span>
+                            <span class="lang-code">FR</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('de')" data-lang="de">
+                            <span class="lang-flag">🇩🇪</span>
+                            <span class="lang-name">Deutsch</span>
+                            <span class="lang-code">DE</span>
+                        </div>
+                        <div class="lang-item" onclick="changeLanguage('en')" data-lang="en">
+                            <span class="lang-flag">🇬🇧</span>
+                            <span class="lang-name">English</span>
+                            <span class="lang-code">EN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-img"></div>
+                <div class="logo-text">
+                    <span class="logo-title">DITIB Fameck</span>
+                    <span class="logo-subtitle" data-tr>Diyanet İşleri Türk İslam Birliği</span>
+                    <span class="logo-subtitle" data-fr style="display: none;">Présidence des Affaires Religieuses</span>
+                    <span class="logo-subtitle" data-de style="display: none;">Präsidium für Religionsangelegenheiten</span>
+                    <span class="logo-subtitle" data-en style="display: none;">Presidency of Religious Affairs</span>
+                </div>
+            </a>
+            
+            <nav class="nav" id="mainNav">
+                <div class="nav-item">
+                    <a href="../index.html" data-tr>Ana Sayfa</a>
+                    <a href="../index.html" data-fr style="display: none;">Accueil</a>
+                    <a href="../index.html" data-de style="display: none;">Startseite</a>
+                    <a href="../index.html" data-en style="display: none;">Home</a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" data-tr>Kurumsal <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" data-fr style="display: none;">Institutionnel <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" data-de style="display: none;">Institutionell <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" data-en style="display: none;">Corporate <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown" data-tr>
+                        <a href="hakkimizda.html">Hakkımızda</a>
+                        <a href="birimler.html">Bölge DİTİB Birimleri</a>
+                        <a href="dernekler.html">Dernekler</a>
+                        <a href="yonetim.html">Yönetim</a>
+                    </div>
+                    <div class="dropdown" data-fr style="display: none;">
+                        <a href="hakkimizda.html">À propos</a>
+                        <a href="birimler.html">Unités Régionales DİTİB</a>
+                        <a href="dernekler.html">Associations</a>
+                        <a href="yonetim.html">Direction</a>
+                    </div>
+                    <div class="dropdown" data-de style="display: none;">
+                        <a href="hakkimizda.html">Über uns</a>
+                        <a href="birimler.html">Regionale DİTİB Einheiten</a>
+                        <a href="dernekler.html">Vereine</a>
+                        <a href="yonetim.html">Verwaltung</a>
+                    </div>
+                    <div class="dropdown" data-en style="display: none;">
+                        <a href="hakkimizda.html">About Us</a>
+                        <a href="birimler.html">Regional DİTİB Units</a>
+                        <a href="dernekler.html">Associations</a>
+                        <a href="yonetim.html">Management</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari" data-tr>Cenaze Fonu</a>
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari" data-fr style="display: none;">Fonds Funéraire</a>
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari" data-de style="display: none;">Beerdigungsfonds</a>
+                    <a href="https://donation.ditibstrasbourg.fr/cenaze-fonlari" data-en style="display: none;">Funeral Fund</a>
+                </div>
+                <div class="nav-item">
+                    <a href="bakimpage.html" data-tr>Online Ödeme</a>
+                    <a href="bakimpage.html" data-fr style="display: none;">Paiement en Ligne</a>
+                    <a href="bakimpage.html" data-de style="display: none;">Online-Zahlung</a>
+                    <a href="bakimpage.html" data-en style="display: none;">Online Payment</a>
+                </div>
+                <div class="nav-item">
+                    <a href="iletisim.html" data-tr>İletişim</a>
+                    <a href="iletisim.html" data-fr style="display: none;">Contact</a>
+                    <a href="iletisim.html" data-de style="display: none;">Kontakt</a>
+                    <a href="iletisim.html" data-en style="display: none;">Contact</a>
+                </div>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü Aç/Kapat">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- YAPIM AŞAMASINDA İÇERİK - KOYU MAVİ BEYAZ -->
+    <main class="main-content">
+        <div class="construction-container">
+            <div class="construction-icon-wrapper">
+                <div class="construction-ring"></div>
+                <div class="construction-icon">
+                    <i class="fas fa-hard-hat"></i>
+                </div>
+            </div>
+            
+            <h1 class="construction-title" data-tr>
+                Sayfa <span>Yapım Aşamasında</span>
+            </h1>
+            <h1 class="construction-title" data-fr style="display: none;">
+                Page en <span>Construction</span>
+            </h1>
+            <h1 class="construction-title" data-de style="display: none;">
+                Seite in <span>Bearbeitung</span>
+            </h1>
+            <h1 class="construction-title" data-en style="display: none;">
+                Page Under <span>Construction</span>
+            </h1>
+            
+            <div class="construction-divider"></div>
+            
+            <p class="construction-message" data-tr>
+                Bu sayfa yapım aşamasındadır. Yakın zamanda hizmetlerinize sunulacaktır.<br>
+                Anlayışınız için teşekkür ederiz.
+            </p>
+            <p class="construction-message" data-fr style="display: none;">
+                Cette page est en construction. Elle sera bientôt mise à votre disposition.<br>
+                Merci de votre compréhension.
+            </p>
+            <p class="construction-message" data-de style="display: none;">
+                Diese Seite befindet sich im Aufbau. Sie wird in Kürze zur Verfügung stehen.<br>
+                Vielen Dank für Ihr Verständnis.
+            </p>
+            <p class="construction-message" data-en style="display: none;">
+                This page is under construction. It will be available to you soon.<br>
+                Thank you for your understanding.
+            </p>
+            
+            <div class="construction-features">
+                <div class="feature-item">
+                    <i class="fas fa-cog fa-spin"></i>
+                    <span data-tr>Geliştirme Devam Ediyor</span>
+                    <span data-fr style="display: none;">Développement en Cours</span>
+                    <span data-de style="display: none;">Entwicklung läuft</span>
+                    <span data-en style="display: none;">Development in Progress</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-clock"></i>
+                    <span data-tr>Yakında Sizlerle</span>
+                    <span data-fr style="display: none;">Bientôt Disponible</span>
+                    <span data-de style="display: none;">Bald Verfügbar</span>
+                    <span data-en style="display: none;">Coming Soon</span>
+                </div>
+            </div>
+            
+            <a href="../index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span data-tr>Ana Sayfaya Dön</span>
+                <span data-fr style="display: none;">Retour à l'Accueil</span>
+                <span data-de style="display: none;">Zurück zur Startseite</span>
+                <span data-en style="display: none;">Back to Home</span>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-social-top">
+                <a href="https://www.facebook.com/ATFFameck" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/atf_fameck/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+
+            <div class="footer-regional">
+                <a href="https://ditibfrance.fr">DİTİB FRANSA</a>
+                <a href="https://www.ditibstrasbourg.fr">DİTİB STRASBOURG</a>
+                <a href="https://ditibparis.fr">DİTİB PARİS</a>
+                <a href="https://ditiblyon.fr">DİTİB LYON</a>
+                <a href="#">DİTİB BORDEAUX</a>
+                <a href="#">DİTİB NANTES</a>
+            </div>
+
+            <div class="footer-divider">
+                <div class="footer-line"></div>
+                <div class="footer-logos">
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo.jpg" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                    <div class="logo-separator"></div>
+                    <div class="footer-logo-circle">
+                        <img src="../img/ATFLogo2.png" alt="DİTİB Logo" style="width: 80%; height: 80%; object-fit: contain;">
+                    </div>
+                </div>
+                <div class="footer-line"></div>
+            </div>
+
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>69 A Rue de la Centrale, 57290 Fameck</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>06 56 67 42 69</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ditib.fameck@gmail.com</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fas fa-clock"></i>
+                    <span data-tr>Hafta İçi 09:30 - 12:30 / 13:30 - 17:30</span>
+                    <span data-fr style="display: none;">Lun-Ven 09:30 - 12:30 / 13:30 - 17:30</span>
+                    <span data-de style="display: none;">Mo-Fr 09:30 - 12:30 / 13:30 - 17:30</span>
+                    <span data-en style="display: none;">Mon-Fri 09:30 - 12:30 / 13:30 - 17:30</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-text">© 2026 Designed and Developed by</div>
+            <div class="footer-developer">
+                <i class="fas fa-lion"></i>
+                Kaan Mahir Hakan
+                <i class="fas fa-lion"></i>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // DİL YÖNETİM SİSTEMİ
+        // ============================================
+
+        const DitibLang = {
+            current: localStorage.getItem('ditib_lang') || 'tr',
+            
+            data: {
+                tr: { flag: '🇹🇷', name: 'Türkçe', code: 'TR' },
+                fr: { flag: '🇫🇷', name: 'Français', code: 'FR' },
+                de: { flag: '🇩🇪', name: 'Deutsch', code: 'DE' },
+                en: { flag: '🇬🇧', name: 'English', code: 'EN' }
+            },
+
+            init() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlLang = urlParams.get('lang');
+                
+                if (urlLang && this.data[urlLang]) {
+                    this.current = urlLang;
+                    localStorage.setItem('ditib_lang', urlLang);
+                }
+                
+                this.updatePage();
+                this.updateButton();
+                document.documentElement.lang = this.current;
+            },
+
+            updatePage() {
+                document.querySelectorAll('[data-tr], [data-fr], [data-de], [data-en]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                document.querySelectorAll(`[data-${this.current}]`).forEach(el => {
+                    const tag = el.tagName.toLowerCase();
+                    const inlineTags = ['a', 'span', 'strong', 'em', 'i', 'b', 'small', 'label'];
+                    
+                    if (inlineTags.includes(tag)) {
+                        el.style.display = 'inline';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                });
+            },
+
+            updateButton() {
+                const flag = document.getElementById('currentFlag');
+                const name = document.getElementById('currentLangName');
+                
+                if (flag) flag.textContent = this.data[this.current].flag;
+                if (name) name.textContent = this.data[this.current].name;
+                
+                document.querySelectorAll('.lang-item').forEach(item => {
+                    const lang = item.getAttribute('data-lang');
+                    item.classList.toggle('active', lang === this.current);
+                });
+            },
+
+            change(lang) {
+                if (!this.data[lang] || lang === this.current) return;
+                
+                this.current = lang;
+                localStorage.setItem('ditib_lang', lang);
+                
+                const url = new URL(window.location);
+                url.searchParams.set('lang', lang);
+                window.history.pushState({}, '', url);
+                
+                this.updatePage();
+                this.updateButton();
+                document.documentElement.lang = lang;
+                this.closeMenu();
+            },
+
+            toggle(e) {
+                e.stopPropagation();
+                const menu = document.getElementById('langDropdown');
+                const btn = document.querySelector('.lang-btn');
+                
+                menu.classList.toggle('active');
+                btn.classList.toggle('active');
+            },
+
+            closeMenu() {
+                const menu = document.getElementById('langDropdown');
+                const btn = document.querySelector('.lang-btn');
+                if (menu) menu.classList.remove('active');
+                if (btn) btn.classList.remove('active');
+            }
+        };
+
+        function toggleLangMenu(e) {
+            DitibLang.toggle(e);
+        }
+
+        function changeLanguage(lang) {
+            DitibLang.change(lang);
+        }
+
+        function initLanguage() {
+            DitibLang.init();
+        }
+
+        // ============================================
+        // MOBİL MENÜ
+        // ============================================
+        
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+
+        // ============================================
+        // EVENT LİSTENER'LAR
+        // ============================================
+
+        document.addEventListener('click', function(e) {
+            const switcher = document.getElementById('langSwitcher');
+            if (switcher && !switcher.contains(e.target)) {
+                DitibLang.closeMenu();
+            }
+        });
+
+        window.addEventListener('popstate', () => {
+            DitibLang.init();
+        });
+
+        // ============================================
+        // INIT
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            DitibLang.init();
+        });
+    </script>
+</body>
+</html>
